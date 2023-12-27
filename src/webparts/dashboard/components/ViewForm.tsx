@@ -98,7 +98,48 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                 }
             }
         });
-
+        NewWeb.lists.getByTitle("Equipment Table Transaction").items.filter(`RequestID eq '${SessionID}'`).orderBy("OrderNo", true).get().then((items: any) => {
+            console.log(items);
+            if (items.length != 0) {
+                $("#permit_request_tbody").empty();
+                $("#permit_request tfoot").hide();
+                for (var m = 0; m < items.length; m++) {
+                    if (m == 0) {
+                        $("#permit_request_tbody").append(`<tr>
+                    <td><p className='location'>${items[m].Title}</p></td>
+                    <td><input readonly type='text' className='location_value' value='${items[m].LocationValue}' /></td>
+                    <td><p className='area'>${items[m].Area}</p></td>
+                    <td>R</td>
+                    <td><input disabled type='checkbox' className='process_r' ${items[m].ProcessR == true ? 'checked' : ''} /></td>
+                    <td>A</td>
+                    <td><input disabled type='checkbox' className='process_a' ${items[m].ProcessA == true ? 'checked' : ''} /></td>
+                    <td>Y</td>
+                    <td><input disabled type='checkbox' className='non_process_y' ${items[m].NonProcessY == true ? 'checked' : ''} /></td>
+                    <td>G</td>
+                    <td><input disabled type='checkbox' className='non_process_g' ${items[m].NonProcessG == true ? 'checked' : ''} /></td>
+                    <td>NC</td>
+                    <td><input disabled type='checkbox' className='non_process_nc' ${items[m].NonProcessNC == true ? 'checked' : ''} /></td>
+                </tr>`)
+                    } else {
+                        $("#permit_request_tbody").append(`<tr>
+                        <td><p className='location'>${items[m].Title}</p></td>
+                        <td><input readonly type='text' className='location_value' value='${items[m].LocationValue}' /></td>
+                        <td><p className='area'>${items[m].Area}</p></td>
+                        <td>0</td>
+                        <td><input disabled type='checkbox' className='process_r' ${items[m].ProcessR == true ? 'checked' : ''} /></td>
+                        <td>1</td>
+                        <td><input disabled type='checkbox' className='process_a' ${items[m].ProcessA == true ? 'checked' : ''} /></td>
+                        <td>2</td>
+                        <td><input disabled type='checkbox' className='non_process_y' ${items[m].NonProcessY == true ? 'checked' : ''} /></td>
+                        <td>G</td>
+                        <td><input disabled type='checkbox' className='non_process_g' ${items[m].NonProcessG == true ? 'checked' : ''} /></td>
+                        <td>NC</td>
+                        <td><input disabled type='checkbox' className='non_process_nc' ${items[m].NonProcessNC == true ? 'checked' : ''} /></td>
+                </tr>`)
+                    }
+                }
+            }
+        });
     }
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);

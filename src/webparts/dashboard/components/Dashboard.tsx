@@ -15,6 +15,7 @@ import 'datatables.net-buttons/js/dataTables.buttons.min';
 import 'datatables.net-buttons/js/buttons.flash.min';
 import 'datatables.net-buttons/js/buttons.html5.min';
 import ViewForm from './ViewForm';
+import Swal from 'sweetalert2';
 
 let NewWeb: any;
 
@@ -125,7 +126,6 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
   }
   public FormListCreation() {
     var batch = NewWeb.createBatch();
-    var handler = this;
     var ListColumns = [{ Name: "NatureofWork", Type: "MultiLine" },
     { Name: "WorkTitle", Type: "MultiLine" },
     { Name: "StartDate", Type: "SingleLine" },
@@ -142,21 +142,24 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     { Name: "PlannedNoofWorkers", Type: "SingleLine" },
     { Name: "Contractor", Type: "Boolean" },
     { Name: "WorkPlanning", Type: "Boolean" },
-    { Name: "RequestID", Type: "MultiLine" },
-    { Name: "Status", Type: "MultiLine" },]
-
+    { Name: "RequestID", Type: "SingleLine" },
+    { Name: "Status", Type: "SingleLine" },]
+    $(".loader").show();
+    $("#configure").hide();
     try {
       const listTitle = "Form Master";
       const listDescription = "Form Template";
       NewWeb.lists.add(listTitle, listDescription, 100, false).then(() => {
         console.log(`${listTitle} List created successfully`);
         ListColumns.forEach(function (item) {
+
           if (item.Type == "SingleLine") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addText(item.Name, 255, {
               Group: "Custom Column",
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+
             })
           }
           else if (item.Type == "MultiLine") {
@@ -165,24 +168,22 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+
             })
           }
           else if (item.Type == "Boolean") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+
             })
           }
         })
         // Execute the batch
         batch.execute().then(function () {
-          NewWeb.lists.getByTitle("Configure Master").items.get().then((items: any) => {
-            if (items.length != 0) {
-              handler.setState({
-                Configure: false,
-                ShowDashboard: true
-              })
-            }
+          $(".loader").hide();
+          Swal.fire('Configured successfully!', '', 'success').then(() => {
+            location.reload();
           })
           console.log("Batch operations completed successfully");
         }).catch(function (error: any) {
@@ -236,10 +237,63 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       console.error("Error creating list:", error);
     }
   }
+  public equipmentListCreation() {
+    var batch = NewWeb.createBatch();
+    var ListColumns = [{ Name: "LocationValue", Type: "SingleLine" },
+    { Name: "Area", Type: "SingleLine" },
+    { Name: "ProcessR", Type: "Boolean" },
+    { Name: "ProcessA", Type: "Boolean" },
+    { Name: "NonProcessY", Type: "Boolean" },
+    { Name: "NonProcessG", Type: "Boolean" },
+    { Name: "NonProcessNC", Type: "Boolean" },
+    { Name: "RequestID", Type: "SingleLine" },
+    { Name: "OrderNo", Type: "Number" },
+    ]
+
+    try {
+      const listTitle = "Equipment Table Transaction";
+      const listDescription = "Form Template";
+      NewWeb.lists.add(listTitle, listDescription, 100, false).then(() => {
+        console.log(`${listTitle} List created successfully`);
+        ListColumns.forEach(function (item) {
+          if (item.Type == "SingleLine") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addText(item.Name, 255, {
+              Group: "Custom Column",
+            }).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+            })
+          }
+          else if (item.Type == "Number") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+            })
+          }
+          else if (item.Type == "Boolean") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+            })
+          }
+        })
+        // Execute the batch
+        batch.execute().then(function () {
+          console.log("Equipment Table List Batch operations completed successfully");
+        }).catch(function (error: any) {
+          console.log("Error in batch operations: " + error);
+        });
+
+      });
+    } catch (error) {
+      console.error("Error creating list:", error);
+    }
+  }
   public createAllDynamicLists() {
-    this.configureListCreation();
+    // this.configureListCreation();
     this.FormListCreation();
-    this.tableListCreation();
+    // this.tableListCreation();
+    // this.equipmentListCreation();
   }
   public goToNewRequestForm() {
     this.setState({
@@ -273,7 +327,10 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     return (
       <>
         {this.state.Configure == true &&
-          <button onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
+          <>
+            <img className='loader' style={{ display: "none" }} src={require("../img/loader-al.gif")} />
+            <button type="button" id='configure' className="btn btn-primary" onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
+          </>
         }
         {this.state.ShowDashboard == true &&
           <>

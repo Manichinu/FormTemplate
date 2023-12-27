@@ -90,16 +90,14 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
         }
 
     }
-    public saveDetails(CurrentSection: string) {
+    public saveDetails() {
         if (RequestID == "") {
             RequestID = "Session-" + moment().format("DDMMYYYYHHmmss");
         }
-        if (CurrentSection == "Section1") {
-            if (this.formValidation()) {
-                this.savePermitRequestDetails();
-                // this.saveLocationEquipmentDetails();
-                this.saveWorkPermitRequestDetails();
-            }
+        if (this.formValidation()) {
+            this.savePermitRequestDetails();
+            this.saveLocationEquipmentDetails();
+            this.saveWorkPermitRequestDetails();
         }
     }
     public savePermitRequestDetails() {
@@ -134,15 +132,15 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
     }
     public saveLocationEquipmentDetails() {
         $("#permit_request_tbody tr").each(function (i, J) {
-            NewWeb.lists.getByTitle("Permit Request Table Transaction").items.add({
+            NewWeb.lists.getByTitle("Equipment Table Transaction").items.add({
                 Title: $(this).find('.location').text(),
                 LocationValue: $(this).find('.location_value').val(),
                 Area: $(this).find('.area').text(),
                 ProcessR: $(this).find(".process_r").prop('checked'),
                 ProcessA: $(this).find(".process_a").prop('checked'),
-                Non_x002d_ProcessY: $(this).find(".non_process_y").prop('checked'),
-                Non_x002d_ProcessG: $(this).find(".non_process_g").prop('checked'),
-                Non_x002d_ProcessNC: $(this).find(".non_process_nc").prop('checked'),
+                NonProcessY: $(this).find(".non_process_y").prop('checked'),
+                NonProcessG: $(this).find(".non_process_g").prop('checked'),
+                NonProcessNC: $(this).find(".non_process_nc").prop('checked'),
                 RequestID: RequestID,
                 OrderNo: i
             });
@@ -617,7 +615,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                 </div>
                                             </div>
                                             <div className="button">
-                                                <button className="submit_btn" onClick={() => this.saveDetails("Section1")}> Submit </button>
+                                                <button className="submit_btn" onClick={() => this.saveDetails()}> Submit </button>
                                                 <button className="cancel_btn"> Cancel </button>
                                             </div>
                                         </div>
