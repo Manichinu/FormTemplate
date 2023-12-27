@@ -290,10 +290,10 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     }
   }
   public createAllDynamicLists() {
-    // this.configureListCreation();
+    this.configureListCreation();
     this.FormListCreation();
-    // this.tableListCreation();
-    // this.equipmentListCreation();
+    this.tableListCreation();
+    this.equipmentListCreation();
   }
   public goToNewRequestForm() {
     this.setState({
@@ -327,10 +327,14 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     return (
       <>
         {this.state.Configure == true &&
-          <>
-            <img className='loader' style={{ display: "none" }} src={require("../img/loader-al.gif")} />
-            <button type="button" id='configure' className="btn btn-primary" onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
-          </>
+          <div>
+            <div className='loader_img'>
+              <img className='loader' style={{ display: "none" }} src={require("../img/loader-al.gif")} />
+            </div>
+            <div className='config'>
+              <button type="button" id='configure' className="btn btn-primary" onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
+            </div>
+          </div>
         }
         {this.state.ShowDashboard == true &&
           <>

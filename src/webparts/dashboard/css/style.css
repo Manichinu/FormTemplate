@@ -2593,3 +2593,17 @@ input[type=radio] {
 #permit_authorization {
     margin-top: 20px;
 }
+
+.config {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    align-items: center;
+}
+
+.loader_img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
