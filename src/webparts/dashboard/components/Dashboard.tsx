@@ -14,7 +14,7 @@ import 'datatables.net-buttons/js/buttons.colVis.min';
 import 'datatables.net-buttons/js/dataTables.buttons.min';
 import 'datatables.net-buttons/js/buttons.flash.min';
 import 'datatables.net-buttons/js/buttons.html5.min';
-
+import ViewForm from './ViewForm';
 
 let NewWeb: any;
 
@@ -29,6 +29,7 @@ export interface DashboardState {
   ViewFormID: any;
   ApprovedStatusCount: number;
   PendingStatusCount: number;
+  Configure: boolean;
 }
 export default class Dashboard extends React.Component<IDashboardProps, DashboardState, {}> {
   public constructor(props: IDashboardProps, state: DashboardState) {
@@ -38,12 +39,13 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       CurrentUserProfilePic: "",
       CurrentUserID: 0,
       DashboardItems: [],
-      ShowDashboard: true,
+      ShowDashboard: false,
       ShowNewForm: false,
       ShowViewForm: false,
       ViewFormID: "",
       ApprovedStatusCount: 0,
-      PendingStatusCount: 0
+      PendingStatusCount: 0,
+      Configure: true
     };
     SPComponentLoader.loadScript(`https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js`);
     SPComponentLoader.loadCss(`https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css`);
@@ -52,6 +54,14 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
   public componentDidMount() {
     this.GetCurrentLoggedUser();
     this.getPermitRequestDetails();
+    NewWeb.lists.getByTitle("Configure Master").items.get().then((items: any) => {
+      if (items.length != 0) {
+        this.setState({
+          Configure: false,
+          ShowDashboard: true
+        })
+      }
+    })
   }
   private async GetCurrentLoggedUser() {
     await NewWeb.currentUser.get().then((user: any) => {
@@ -68,7 +78,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
   public getPermitRequestDetails() {
     var PendingStatus = 0;
     var ApprovedStatus = 0;
-    NewWeb.lists.getByTitle("Permit Request Transaction").items.orderBy("Created", false).get().then((items: any) => {
+    NewWeb.lists.getByTitle("Form Master").items.orderBy("Created", false).get().then((items: any) => {
       console.log(items);
       for (let i = 0; i < items.length; i++) {
         if (items[i].Status == "Pending") {
@@ -115,6 +125,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
   }
   public FormListCreation() {
     var batch = NewWeb.createBatch();
+    var handler = this;
     var ListColumns = [{ Name: "NatureofWork", Type: "MultiLine" },
     { Name: "WorkTitle", Type: "MultiLine" },
     { Name: "StartDate", Type: "SingleLine" },
@@ -129,8 +140,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     { Name: "Section", Type: "SingleLine" },
     { Name: "Name", Type: "SingleLine" },
     { Name: "PlannedNoofWorkers", Type: "SingleLine" },
-    { Name: "Contractor", Type: "YesorNo" },
-    { Name: "WorkPlanning", Type: "YesorNo" },
+    { Name: "Contractor", Type: "Boolean" },
+    { Name: "WorkPlanning", Type: "Boolean" },
     { Name: "RequestID", Type: "MultiLine" },
     { Name: "Status", Type: "MultiLine" },]
 
@@ -156,11 +167,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
               console.log(`${item.Name} column created successfully`)
             })
           }
-          else if (item.Type == "YesorNo") {
-            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name, {
-              Group: "Custom Column",
-              DefaultValue: false,
-            }).then(() => {
+          else if (item.Type == "Boolean") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
             })
@@ -168,6 +176,14 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
         })
         // Execute the batch
         batch.execute().then(function () {
+          NewWeb.lists.getByTitle("Configure Master").items.get().then((items: any) => {
+            if (items.length != 0) {
+              handler.setState({
+                Configure: false,
+                ShowDashboard: true
+              })
+            }
+          })
           console.log("Batch operations completed successfully");
         }).catch(function (error: any) {
           console.log("Error in batch operations: " + error);
@@ -202,9 +218,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             })
           }
           else if (item.Type == "Number") {
-            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name, {
-              Group: "Custom Column",
-            }).then(() => {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
             })
@@ -223,8 +237,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     }
   }
   public createAllDynamicLists() {
-    // this.configureListCreation();
-    // this.FormListCreation();
+    this.configureListCreation();
+    this.FormListCreation();
     this.tableListCreation();
   }
   public goToNewRequestForm() {
@@ -236,6 +250,14 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
   }
   private Dropdown() {
     $(".user-profile-details").toggleClass("open");
+  }
+  public goToViewForm(id: number) {
+    this.setState({
+      ViewFormID: id,
+      ShowDashboard: false,
+      ShowViewForm: true
+    })
+
   }
   public render(): React.ReactElement<IDashboardProps> {
     // const {
@@ -250,7 +272,9 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     SPComponentLoader.loadScript(`https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js`);
     return (
       <>
-        {/* <button onClick={() => this.createAllDynamicLists()}>Click here to Configure</button> */}
+        {this.state.Configure == true &&
+          <button onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
+        }
         {this.state.ShowDashboard == true &&
           <>
             <div>
@@ -341,7 +365,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
                                   <span>{item.Status}</span>
                                 </td>
                                 <td className='text-center'><a href='#' title='View Request'>
-                                  <img className="view_img" src={require('../img/view.svg')} alt="image" /> </a>
+                                  <img className="view_img" src={require('../img/view.svg')} onClick={() => this.goToViewForm(item.RequestID)} alt="image" /> </a>
                                 </td>
                               </tr>
                             ];
@@ -361,6 +385,13 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
         {this.state.ShowNewForm == true &&
           <NewRequestForm
             itemId={0}
+            description={''}
+            siteurl={this.props.siteurl} isDarkTheme={false} environmentMessage={''} hasTeamsContext={false} userDisplayName={''}
+          />
+        }
+        {this.state.ShowViewForm == true &&
+          <ViewForm
+            itemId={this.state.ViewFormID}
             description={''}
             siteurl={this.props.siteurl} isDarkTheme={false} environmentMessage={''} hasTeamsContext={false} userDisplayName={''}
           />

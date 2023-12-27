@@ -4,37 +4,38 @@ import type { IDashboardProps } from './IDashboardProps';
 // import { escape } from '@microsoft/sp-lodash-subset';
 import { SPComponentLoader } from '@microsoft/sp-loader';
 import * as $ from 'jquery';
-import Swal from 'sweetalert2';
 import { Web } from '@pnp/sp/presets/all';
-import * as moment from "moment";
 import Dashboard from './Dashboard';
 
 
 let NewWeb: any;
-let RequestID = "";
+let SessionID: any;
 
-export interface FormState {
+export interface ViewFormState {
     LoggedinuserName: string;
     CurrentUserProfilePic: string;
     CurrentUserID: number;
     ShowDashboard: boolean;
-    ShowNewForm: boolean;
+    ShowViewForm: boolean;
 }
 
-export default class NewRequestForm extends React.Component<IDashboardProps, FormState, {}> {
-    public constructor(props: IDashboardProps, state: FormState) {
+export default class ViewForm extends React.Component<IDashboardProps, ViewFormState, {}> {
+    public constructor(props: IDashboardProps, state: ViewFormState) {
         super(props);
         this.state = {
             LoggedinuserName: "",
             CurrentUserProfilePic: "",
             CurrentUserID: 0,
             ShowDashboard: false,
-            ShowNewForm: true
+            ShowViewForm: true
         };
         NewWeb = Web(this.props.siteurl);
+        SessionID = this.props.itemId;
     }
     public componentDidMount() {
         this.GetCurrentLoggedUser();
+        this.getPermitRequestTransaction();
+        this.getTableDetails();
         $(".cancel_btn").on('click', function () {
             location.reload();
         })
@@ -47,7 +48,6 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                 LoggedinuserName: user.Title,
                 CurrentUserProfilePic: `${this.props.siteurl}/_layouts/15/userphoto.aspx?size=L&username=${user.Title}`
             });
-            // this.getWorkflowHistory();
         }, (errorResponse: any) => {
         });
         console.log(this.state.LoggedinuserName, this.state.CurrentUserProfilePic);
@@ -55,284 +55,50 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
     private Dropdown() {
         $(".user-profile-details").toggleClass("open");
     }
-    public addNewRow(Section: string) {
-        if (Section == "Level1Table") {
-            $("#work_permit_tbody").append(`
-    <tr>
-      <td><input type='text' id='Work_permit_name' /></td>
-      <td><input type='text' id='Work_permit_company' /></td>
-      <td><input type='text' id='Work_permit_position'/></td>
-      <td><input type='datetime-local' id='Work_permit_date'/></td>
-       </tr>
-     `);
-            // $("#work_permit_tbody").on("click", ".delete-icon", function (eve) {
-            //   const rowCount = $("#work_permit_tbody tr").length;
-            //   if (rowCount === 1) {
-            //     Swal.fire({
-            //       title: 'Table must have at least one row',
-            //       icon: 'error',
-            //       showCancelButton: false,
-            //       confirmButtonText: 'Ok',
-            //     });
-            //     return; // Exit the function without saving
-            //   } else {
-            //     Swal.fire({
-            //       title: 'Are you sure,you want to delete?', showConfirmButton: true,
-            //       showCancelButton: true, confirmButtonText: 'Delete',
-            //     }).then(async (result) => {
-            //       if (result.isConfirmed) {
-            //         $(this).closest("tr").remove();
-            //         Swal.fire('Deleted Successfully!', '', 'success');
-            //       }
-            //     });
-            //   }
-            // });
-        }
-
-    }
-    public saveDetails(CurrentSection: string) {
-        if (RequestID == "") {
-            RequestID = "Session-" + moment().format("DDMMYYYYHHmmss");
-        }
-        if (CurrentSection == "Section1") {
-            if (this.formValidation()) {
-                this.savePermitRequestDetails();
-                // this.saveLocationEquipmentDetails();
-                this.saveWorkPermitRequestDetails();
-            }
-        }
-    }
-    public savePermitRequestDetails() {
-        var Contractor = $("#contractor1").prop("checked");
-        var WorkPlanning = $("#planned1").prop("checked");
-
-        NewWeb.lists.getByTitle("Form Master").items.add({
-            Title: "Form",
-            NatureofWork: $("#work_nature").val(),
-            WorkTitle: $("#work_title").val(),
-            StartDate: $("#start_date").val(),
-            EndDate: $("#end_date").val(),
-            EquipmentDescription: $("#equipment_description").val(),
-            HazardousAreaclassification: $("#hazardous_description").val(),
-            DescriptionofWork: $("#work_description").val(),
-            Toolstobeused: $("#tools").val(),
-            SourceofIgnition: $("#source_ignition").val(),
-            HazardousMaterialsInvolved: $("#hazardous_materials").val(),
-            JobPerformer: $("#job_performer").val(),
-            Section: $("#section").val(),
-            Name: $("#name").val(),
-            PlannedNoofWorkers: $("#no_of_workers").val(),
-            Contractor: Contractor,
-            WorkPlanning: WorkPlanning,
-            RequestID: RequestID,
-            Status: "Pending"
-        }).then(() => {
-            Swal.fire('Submitted successfully!', '', 'success').then(() => {
-                location.reload();
-            })
-        })
-    }
-    public saveLocationEquipmentDetails() {
-        $("#permit_request_tbody tr").each(function (i, J) {
-            NewWeb.lists.getByTitle("Permit Request Table Transaction").items.add({
-                Title: $(this).find('.location').text(),
-                LocationValue: $(this).find('.location_value').val(),
-                Area: $(this).find('.area').text(),
-                ProcessR: $(this).find(".process_r").prop('checked'),
-                ProcessA: $(this).find(".process_a").prop('checked'),
-                Non_x002d_ProcessY: $(this).find(".non_process_y").prop('checked'),
-                Non_x002d_ProcessG: $(this).find(".non_process_g").prop('checked'),
-                Non_x002d_ProcessNC: $(this).find(".non_process_nc").prop('checked'),
-                RequestID: RequestID,
-                OrderNo: i
-            });
-        })
-    }
-    public saveWorkPermitRequestDetails() {
-        var itemsToCreate: any = [];
-        var batch = NewWeb.createBatch();
-        $("#work_permit_tbody tr").each(function (i, J) {
-            // NewWeb.lists.getByTitle("Work Permit Request Transaction").items.add({
-            var Name = $(this).find('#Work_permit_name').val();
-            var Company = $(this).find('#Work_permit_company').val();
-            var Position = $(this).find('#Work_permit_position').val();
-            var Date = $(this).find('#Work_permit_date').val();
-            var Sessionid = RequestID;
-            var OrderNo = i
-            // });
-            var item = {
-                Title: Name,
-                Company: Company,
-                Position: Position,
-                Date: Date,
-                RequestID: Sessionid,
-                OrderNo: OrderNo
-            };
-            itemsToCreate.push({
-                action: "create",
-                item: item
-            });
-        })
-        // Execute the batch operations
-        itemsToCreate.forEach(function (itemToCreate: any) {
-            if (itemToCreate.action === "create") {
-                NewWeb.lists.getByTitle("Permit Table Transaction").inBatch(batch).items.add(itemToCreate.item);
-            }
-        });
-
-        // Execute the batch
-        batch.execute().then(function () {
-            console.log("Batch operations completed successfully Work Permit Request Transaction");
-        }).catch(function (error: any) {
-            console.log("Error in batch operations Work Permit Request Transaction: " + error);
-        });
-    }
-    public formValidation() {
-        var FormStatus = true;
-        var NatureofWork = $("#work_nature").val();
-        var WorkTitle = $("#work_title").val();
-        var StartDate = $("#start_date").val();
-        var EndDate = $("#end_date").val();
-        var Equipment = $("#equipment_description").val();
-        var HazardousArea = $("#hazardous_description").val();
-        var Description = $("#work_description").val();
-        var Tools = $("#tools").val();
-        var Source = $("#source_ignition").val();
-        var Hazardous = $("#hazardous_materials").val();
-        var JP = $("#job_performer").val();
-        var Section = $("#section").val();
-        var Name = $("#name").val();
-        var NoofWorkers = $("#no_of_workers").val();
-        var Contractor = $(".contractor:checked").length;
-        var Planning = $(".planning:checked").length;
-
-        if (NatureofWork == "") {
-            $(".err-nature").show();
-            FormStatus = false
-        } else {
-            $(".err-nature").hide();
-        }
-        if (WorkTitle == "") {
-            $(".err-title").show();
-            FormStatus = false
-        } else {
-            $(".err-title").hide();
-        }
-        if (StartDate == "") {
-            $(".err-start").show();
-            FormStatus = false
-        } else {
-            $(".err-start").hide();
-        }
-        if (EndDate == "") {
-            $(".err-end").show();
-            FormStatus = false
-        } else {
-            $(".err-end").hide();
-        }
-        if (Equipment == "") {
-            $(".err-equipment").show();
-            FormStatus = false
-        } else {
-            $(".err-equipment").hide();
-        }
-        if (HazardousArea == "") {
-            $(".err-area").show();
-            FormStatus = false
-        } else {
-            $(".err-area").hide();
-        }
-        if (Description == "") {
-            $(".err-desc").show();
-            FormStatus = false
-        } else {
-            $(".err-desc").hide();
-        }
-        if (Tools == "") {
-            $(".err-tools").show();
-            FormStatus = false
-        } else {
-            $(".err-tools").hide();
-        }
-        if (Source == "") {
-            $(".err-source").show();
-            FormStatus = false
-        } else {
-            $(".err-source").hide();
-        }
-        if (Hazardous == "") {
-            $(".err-hazardous").show();
-            FormStatus = false
-        } else {
-            $(".err-hazardous").hide();
-        }
-        if (JP == "") {
-            $(".err-jp").show();
-            FormStatus = false
-        } else {
-            $(".err-jp").hide();
-        }
-        if (Section == "") {
-            $(".err-section").show();
-            FormStatus = false
-        } else {
-            $(".err-section").hide();
-        }
-        if (Name == "") {
-            $(".err-name").show();
-            FormStatus = false
-        } else {
-            $(".err-name").hide();
-        }
-        if (NoofWorkers == "") {
-            $(".err-workers").show();
-            FormStatus = false
-        } else {
-            $(".err-workers").hide();
-        }
-        if (Contractor == 0) {
-            $(".err-contractor").show();
-            FormStatus = false
-        } else {
-            $(".err-contractor").hide();
-        }
-        if (Planning == 0) {
-            $(".err-planning").show();
-            FormStatus = false
-        } else {
-            $(".err-planning").hide();
-        }
-        // $("#work_permit_tbody tr").each(function (i, J) {
-        //     var Name = $(this).find('#Work_permit_name').val();
-        //     var Company = $(this).find('#Work_permit_company').val();
-        //     var Position = $(this).find('#Work_permit_position').val();
-        //     var Date = $(this).find('#Work_permit_date').val();
-        //     if (Name == "" || Company == "" || Position == "" || Date == "") {
-        //         FormStatus = false
-        //     }
-        // });
-        // $("#permit_request_tbody tr").each(function (i, J) {
-        //     var LocationValue = $(this).find('.location_value').val();
-        //     if (LocationValue == "") {
-        //         FormStatus = false
-        //     }
-        // })
-        // if (FormStatus == false) {
-        //     Swal.fire({
-        //         text: "Please fill all the fields",
-        //         icon: "warning",
-        //         customClass: {
-        //             popup: 'form-validation',
-        //         },
-        //     });
-        // }
-        return FormStatus;
-    }
     public goToDashboard() {
         this.setState({
             ShowDashboard: true,
-            ShowNewForm: false
+            ShowViewForm: false
         })
+    }
+    public getPermitRequestTransaction() {
+        NewWeb.lists.getByTitle("Form Master").items.filter(`RequestID eq '${SessionID}'`).get().then((items: any) => {
+            console.log(items);
+            $("#work_nature").val(items[0].NatureofWork);
+            $("#work_title").val(items[0].WorkTitle);
+            $("#start_date").val(items[0].StartDate);
+            $("#end_date").val(items[0].EndDate);
+            $("#equipment_description").val(items[0].EquipmentDescription);
+            $("#hazardous_description").val(items[0].HazardousAreaclassification);
+            $("#work_description").val(items[0].DescriptionofWork);
+            $("#tools").val(items[0].Toolstobeused);
+            $("#source_ignition").val(items[0].SourceofIgnition);
+            $("#hazardous_materials").val(items[0].HazardousMaterialsInvolved);
+            $("#job_performer").val(items[0].JobPerformer);
+            $("#section").val(items[0].Section);
+            $("#name").val(items[0].Name);
+            $("#no_of_workers").val(items[0].PlannedNoofWorkers);
+            items[0].Contractor == true ? $("#contractor1").prop("checked", true) : $("#contractor2").prop("checked", true);
+            items[0].WorkPlanning == true ? $("#planned1").prop("checked", true) : $("#planned2").prop("checked", true);
+        })
+    }
+    public getTableDetails() {
+        NewWeb.lists.getByTitle("Permit Table Transaction").items.filter(`RequestID eq '${SessionID}'`).orderBy("OrderNo", true).get().then((items: any) => {
+            console.log(items);
+            if (items.length != 0) {
+                $("#work_permit_tbody").empty();
+                $("#work_permit tfoot").hide();
+                for (var i = 0; i < items.length; i++) {
+                    $("#work_permit_tbody").append(`<tr>
+                    <td><input type='text' id='work_permit_name' value='${items[i].Title}' readonly  /></td>
+                    <td><input type='text' id='work_permit_company' value='${items[i].Company}' readonly  /></td>
+                    <td><input type='text' id='work_permit_position' value='${items[i].Position}' readonly  /></td>
+                    <td><input type='datetime-local' id='work_permit_date' value='${items[i].Date}' readonly  /></td>
+                </tr>`)
+                }
+            }
+        });
+
     }
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);
@@ -350,7 +116,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
 
         return (
             <>
-                {this.state.ShowNewForm == true &&
+                {this.state.ShowViewForm == true &&
                     <div>
                         <header>
                             <div className="container clearfix">
@@ -607,19 +373,15 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                                     <td><input type='datetime-local' id='Work_permit_date' /></td>
                                                                 </tr>
                                                             </tbody>
-                                                            <tfoot>
-                                                                <tr className='final-row'>
-                                                                    <td colSpan={7}> <div className="Add_new"> <a href="#" onClick={() => this.addNewRow("Level1Table")}> Add New </a></div></td>
-                                                                </tr>
-                                                            </tfoot>
+
                                                         </table>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="button">
-                                                <button className="submit_btn" onClick={() => this.saveDetails("Section1")}> Submit </button>
+                                            {/* <div className="button">
+                                                <button className="submit_btn"> Submit </button>
                                                 <button className="cancel_btn"> Cancel </button>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 </div>
