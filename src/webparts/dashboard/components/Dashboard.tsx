@@ -15,6 +15,7 @@ import 'datatables.net-buttons/js/dataTables.buttons.min';
 import 'datatables.net-buttons/js/buttons.flash.min';
 import 'datatables.net-buttons/js/buttons.html5.min';
 
+
 let NewWeb: any;
 
 export interface DashboardState {
@@ -256,17 +257,17 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
               <header>
                 <div className="container clearfix">
                   <div className="logo">
-                    <a href="#"> <img src="../img/add.svg" alt="image" /> </a>
+                    <a href="#"> <img src={require('../img/Logo.png')} alt="image" /> </a>
                   </div>
                   <div className="notification-part">
                     <ul>
                       <li> <a href="#"> <img className="user_img" src={`${this.state.CurrentUserProfilePic}`} alt="image" /> </a> </li>
                       <li> <span> {this.state.LoggedinuserName} </span> </li>
-                      <li> <a href="#"> <img className="next_img" src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/dropdown.svg`} onClick={this.Dropdown} alt="image" /> </a> </li>
+                      <li> <a href="#"> <img className="next_img" src={require('../img/dropdown.svg')} onClick={this.Dropdown} alt="image" /> </a> </li>
                     </ul>
                     <div className="user-profile-details"><h3>  {this.state.LoggedinuserName} </h3>
                       <div className="logou-bck"><a href="https://login.windows.net/common/oauth2/logout" data-interception="off">
-                        <img src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/logout_img.svg`} data-themekey="#" />Logout </a>
+                        <img src={require('../img/logout_img.svg')} data-themekey="#" />Logout </a>
                       </div>
                     </div>
                   </div>
@@ -287,7 +288,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
                       <div className="col-md-4">
                         <div className="three-blocks">
                           <div className="three-blocks-img">
-                            <img src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/Approved.svg`} alt="image" />
+                            <img src={require('../img/Approved.svg')} alt="image" />
                           </div>
                           <div className="three-blocks-desc">
                             <h3>{this.state.ApprovedStatusCount}</h3>
@@ -299,7 +300,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
                       <div className="col-md-4">
                         <div className="three-blocks">
                           <div className="three-blocks-img">
-                            <img src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/pending.svg`} alt="image" />
+                            <img src={require('../img/pending.svg')} alt="image" />
                           </div>
                           <div className="three-blocks-desc">
                             <h3>{this.state.PendingStatusCount}</h3>
@@ -340,7 +341,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
                                   <span>{item.Status}</span>
                                 </td>
                                 <td className='text-center'><a href='#' title='View Request'>
-                                  <img className="view_img" src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/view.svg`} alt="image" /> </a>
+                                  <img className="view_img" src={require('../img/view.svg')} alt="image" /> </a>
                                 </td>
                               </tr>
                             ];

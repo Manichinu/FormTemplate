@@ -349,17 +349,17 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                         <header>
                             <div className="container clearfix">
                                 <div className="logo">
-                                    <a href="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SitePages/HotWorkForm.aspx?env=WebView"> <img src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/Logo.png`} alt="image" /> </a>
+                                    <a href="#"> <img src={require('../img/Logo.png')} alt="image" /> </a>
                                 </div>
                                 <div className="notification-part">
                                     <ul>
                                         <li> <a href="#"> <img className="user_img" src={`${this.state.CurrentUserProfilePic}`} alt="image" /> </a> </li>
                                         <li> <span> {this.state.LoggedinuserName} </span> </li>
-                                        <li> <a href="#"> <img className="next_img" src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/dropdown.svg`} onClick={this.Dropdown} alt="image" /> </a> </li>
+                                        <li> <a href="#"> <img className="next_img" src={require('../img/dropdown.svg')} onClick={this.Dropdown} alt="image" /> </a> </li>
                                     </ul>
                                     <div className="user-profile-details"><h3>  {this.state.LoggedinuserName} </h3>
                                         <div className="logou-bck"><a href="https://login.windows.net/common/oauth2/logout" data-interception="off">
-                                            <img src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/logout_img.svg`} data-themekey="#" />Logout </a>
+                                            <img src={require('../img/logout_img.svg')} data-themekey="#" />Logout </a>
                                         </div>
                                     </div>
                                 </div>
@@ -371,7 +371,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                     <div className="header_form">
                                         <div>
                                             <a href="#" className='tooltip-back'>
-                                                <img /* data-toggle="tooltip" title="back" */ src={`${this.props.siteurl}/SiteAssets/AlQasimiForms/img/next.svg`} /> <span className='tooltiptext-back'>back</span>
+                                                <img /* data-toggle="tooltip" title="back" */ src={require('../img/next.svg')} /> <span className='tooltiptext-back'>back</span>
                                             </a>
                                         </div>
                                         <h2>Form Template</h2>
@@ -385,28 +385,28 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                         <div className="form-group">
                                                             <label> Nature of Work </label>
                                                             <textarea id="work_nature" className="form-control" ></textarea>
-                                                            <p className='err-msg err-nature' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                            <p className='err-msg err-nature' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
                                                     <div className="col-md-3">
                                                         <div className="form-group">
                                                             <label>Work Title</label>
                                                             <textarea id="work_title" className="form-control" ></textarea>
-                                                            <p className='err-msg err-title' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                            <p className='err-msg err-title' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
                                                     <div className="col-md-3">
                                                         <div className="form-group">
                                                             <label> Planned Start Date </label>
                                                             <input type="date" id="start_date" className="form-control" />
-                                                            <p className='err-msg err-start' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                            <p className='err-msg err-start' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
                                                     <div className="col-md-3">
                                                         <div className="form-group">
                                                             <label> Planned Finish Date </label>
                                                             <input type="date" id="end_date" className="form-control" />
-                                                            <p className='err-msg err-end' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                            <p className='err-msg err-end' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
 
@@ -472,21 +472,21 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                         <div className="form-group">
                                                             <label>Equipment Description </label>
                                                             <textarea id="equipment_description" className="form-control"></textarea>
-                                                            <p className='err-msg err-equipment' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                            <p className='err-msg err-equipment' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
                                                     <div className="col-md-3">
                                                         <div className="form-group">
                                                             <label> HAC Hazardous Area classification  </label>
                                                             <textarea id="hazardous_description" className="form-control"></textarea>
-                                                            <p className='err-msg err-area' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                            <p className='err-msg err-area' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
                                                     <div className="col-md-3">
                                                         <div className="form-group">
                                                             <label> Description of Work </label>
                                                             <textarea id="work_description" className="form-control"></textarea>
-                                                            <p className='err-msg err-desc' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                            <p className='err-msg err-desc' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -497,28 +497,28 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                             <div className="form-group">
                                                                 <label>Tools to be used</label>
                                                                 <input type='text' id='tools' className="form-control" />
-                                                                <p className='err-msg err-tools' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-tools' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                         <div className="col-md-3">
                                                             <div className="form-group">
                                                                 <label>Source of ignition</label>
                                                                 <input type='text' id='source_ignition' className="form-control" />
-                                                                <p className='err-msg err-source' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-source' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                         <div className="col-md-3">
                                                             <div className="form-group">
                                                                 <label>Hazardous Materials Involved</label>
                                                                 <textarea id="hazardous_materials" className="form-control"></textarea>
-                                                                <p className='err-msg err-hazardous' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-hazardous' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                         <div className="col-md-3">
                                                             <div className="form-group">
                                                                 <label>Job Performer (JP) Details</label>
                                                                 <textarea id="job_performer" className="form-control"></textarea>
-                                                                <p className='err-msg err-jp' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-jp' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -527,21 +527,21 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                             <div className="form-group">
                                                                 <label>Section/Department</label>
                                                                 <input type='text' id='section' className="form-control" />
-                                                                <p className='err-msg err-section' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-section' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                         <div className="col-md-3">
                                                             <div className="form-group">
                                                                 <label>Name</label>
                                                                 <input type='text' id='name' className="form-control" />
-                                                                <p className='err-msg err-name' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-name' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                         <div className="col-md-3">
                                                             <div className="form-group">
                                                                 <label>Planned No.of Workers</label>
                                                                 <input type='text' id='no_of_workers' className="form-control" />
-                                                                <p className='err-msg err-workers' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-workers' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                         <div className="col-md-3 radio_block">
@@ -557,7 +557,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                                         <label className="form-check-label" htmlFor="contractor2">No</label>
                                                                     </div>
                                                                 </div>
-                                                                <p className='err-msg err-contractor' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-contractor' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -575,7 +575,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                                         <label className="form-check-label" htmlFor="planned2">Break-in/Emergency</label>
                                                                     </div>
                                                                 </div>
-                                                                <p className='err-msg err-planning' style={{ display: "none" }}><img src="https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SiteAssets/AlQasimiForms/img/error.svg" className="err-icon" />This field is required</p>
+                                                                <p className='err-msg err-planning' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
                                                     </div>
