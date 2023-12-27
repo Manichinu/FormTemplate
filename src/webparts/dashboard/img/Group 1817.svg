@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <g id="Group_1817" data-name="Group 1817" transform="translate(-113 -177)">
+    <g id="Ellipse_113" data-name="Ellipse 113" transform="translate(113 177)" fill="#fff" stroke="#eee" stroke-width="25">
+      <circle cx="80" cy="80" r="80" stroke="none"/>
+      <circle cx="80" cy="80" r="67.5" fill="none"/>
+    </g>
+    <g id="Ellipse_114" data-name="Ellipse 114" transform="translate(113 177)" fill="none" stroke="#d54608" stroke-width="25" stroke-dasharray="165 1000">
+      <circle cx="80" cy="80" r="80" stroke="none"/>
+      <circle cx="80" cy="80" r="67.5" fill="none"/>
+    </g>
+    <text id="_20_" data-name="20%" transform="translate(193 268)" fill="#333" font-size="27" font-family="Roboto-Regular, Roboto"><tspan x="-25.049" y="0">20%</tspan></text>
+  </g>
+</svg>
