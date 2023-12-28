@@ -46,23 +46,16 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       ViewFormID: "",
       ApprovedStatusCount: 0,
       PendingStatusCount: 0,
-      Configure: true
+      Configure: false
     };
     SPComponentLoader.loadScript(`https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js`);
     SPComponentLoader.loadCss(`https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css`);
     NewWeb = Web(this.props.siteurl)
   }
   public componentDidMount() {
+    this.checkConfiguredOrNot();
     this.GetCurrentLoggedUser();
     this.getPermitRequestDetails();
-    NewWeb.lists.getByTitle("Configure Master").items.get().then((items: any) => {
-      if (items.length != 0) {
-        this.setState({
-          Configure: false,
-          ShowDashboard: true
-        })
-      }
-    })
   }
   private async GetCurrentLoggedUser() {
     await NewWeb.currentUser.get().then((user: any) => {
@@ -75,6 +68,20 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     }, (errorResponse: any) => {
     });
     console.log(this.state.LoggedinuserName, this.state.CurrentUserProfilePic);
+  }
+  public checkConfiguredOrNot() {
+    NewWeb.lists.getByTitle("Configure Master").items.get().then((items: any) => {
+      if (items.length != 0) {
+        this.setState({
+          ShowDashboard: true
+        })
+      }
+    }).catch((error: any) => {
+      this.setState({
+        Configure: true,
+      })
+      console.error("An error occurred:", error);
+    });
   }
   public getPermitRequestDetails() {
     var PendingStatus = 0;
