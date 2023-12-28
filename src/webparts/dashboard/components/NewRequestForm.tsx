@@ -378,7 +378,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                 <img /* data-toggle="tooltip" title="back" */ src={require('../img/next.svg')} /> <span className='tooltiptext-back'>back</span>
                                             </a>
                                         </div>
-                                        <h2>Form Template</h2>
+                                        <h2>New Form</h2>
                                     </div>
                                     <div className='clearfix wrapper-main'>
                                         <div className='section1 forms'>

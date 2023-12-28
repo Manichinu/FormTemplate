@@ -187,7 +187,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                                                 <img /* data-toggle="tooltip" title="back" */ src={require('../img/next.svg')} /> <span className='tooltiptext-back'>back</span>
                                             </a>
                                         </div>
-                                        <h2>Form Template</h2>
+                                        <h2>View Form</h2>
                                     </div>
                                     <div className='clearfix wrapper-main'>
                                         <div className='section1 forms'>
