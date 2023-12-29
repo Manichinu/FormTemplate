@@ -334,13 +334,9 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     return (
       <>
         {this.state.Configure == true &&
-          <div>
-            <div className='loader_img'>
-              <img className='loader' style={{ display: "none" }} src={require("../img/loader-al.gif")} />
-            </div>
-            <div className='config'>
-              <button type="button" id='configure' className="btn btn-primary" onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
-            </div>
+          <div className='config'>
+            <img className='loader' style={{ display: "none" }} src={require("../img/loader-al.gif")} />
+            <button type="button" id='configure' className="btn btn-primary" onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
           </div>
         }
         {this.state.ShowDashboard == true &&
