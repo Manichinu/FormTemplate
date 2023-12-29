@@ -18,6 +18,7 @@ import ViewForm from './ViewForm';
 import Swal from 'sweetalert2';
 
 let NewWeb: any;
+let progressEndValue = 100;
 
 export interface DashboardState {
   LoggedinuserName: string;
@@ -131,8 +132,19 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       console.error("Error creating list:", error);
     }
   }
-  public FormListCreation() {
+  public updateProgress(value: any) {
+    $(".progress-value").text(`${value}%`);
+    $(".circular-progress").css("background", `conic-gradient(#7d2ae8 ${value * 3.6}deg, #ededed 0deg)`);
+    if (value >= progressEndValue) {
+      Swal.fire('Configured successfully!', '', 'success').then(() => {
+        location.reload();
+      })
+      $(".progress_container").hide();
+    }
+  }
+  public async FormListCreation() {
     var batch = NewWeb.createBatch();
+    var handler = this;
     var ListColumns = [{ Name: "NatureofWork", Type: "MultiLine" },
     { Name: "WorkTitle", Type: "MultiLine" },
     { Name: "StartDate", Type: "SingleLine" },
@@ -151,14 +163,12 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     { Name: "WorkPlanning", Type: "Boolean" },
     { Name: "RequestID", Type: "SingleLine" },
     { Name: "Status", Type: "SingleLine" },]
-    $(".loader").show();
-    $("#configure").hide();
     try {
       const listTitle = "Form Master";
       const listDescription = "Form Template";
       NewWeb.lists.add(listTitle, listDescription, 100, false).then(() => {
         console.log(`${listTitle} List created successfully`);
-        ListColumns.forEach(function (item) {
+        ListColumns.forEach(function (item, index) {
 
           if (item.Type == "SingleLine") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addText(item.Name, 255, {
@@ -166,7 +176,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
           else if (item.Type == "MultiLine") {
@@ -175,23 +186,21 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
           else if (item.Type == "Boolean") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
         })
         // Execute the batch
         batch.execute().then(function () {
-          $(".loader").hide();
-          Swal.fire('Configured successfully!', '', 'success').then(() => {
-            location.reload();
-          })
           console.log("Batch operations completed successfully");
         }).catch(function (error: any) {
           console.log("Error in batch operations: " + error);
@@ -202,8 +211,9 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       console.error("Error creating list:", error);
     }
   }
-  public tableListCreation() {
+  public async tableListCreation() {
     var batch = NewWeb.createBatch();
+    var handler = this;
     var ListColumns = [{ Name: "Company", Type: "SingleLine" },
     { Name: "Position", Type: "SingleLine" },
     { Name: "Date", Type: "SingleLine" },
@@ -216,19 +226,23 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       const listDescription = "Form Template";
       NewWeb.lists.add(listTitle, listDescription, 100, false).then(() => {
         console.log(`${listTitle} List created successfully`);
-        ListColumns.forEach(function (item) {
+        ListColumns.forEach(function (item, index) {
           if (item.Type == "SingleLine") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addText(item.Name, 255, {
               Group: "Custom Column",
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
           else if (item.Type == "Number") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
         })
@@ -244,8 +258,9 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       console.error("Error creating list:", error);
     }
   }
-  public equipmentListCreation() {
+  public async equipmentListCreation() {
     var batch = NewWeb.createBatch();
+    var handler = this;
     var ListColumns = [{ Name: "LocationValue", Type: "SingleLine" },
     { Name: "Area", Type: "SingleLine" },
     { Name: "ProcessR", Type: "Boolean" },
@@ -262,25 +277,31 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       const listDescription = "Form Template";
       NewWeb.lists.add(listTitle, listDescription, 100, false).then(() => {
         console.log(`${listTitle} List created successfully`);
-        ListColumns.forEach(function (item) {
+        ListColumns.forEach(function (item, index) {
           if (item.Type == "SingleLine") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addText(item.Name, 255, {
               Group: "Custom Column",
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
           else if (item.Type == "Number") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
           else if (item.Type == "Boolean") {
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
             })
           }
         })
@@ -296,11 +317,17 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       console.error("Error creating list:", error);
     }
   }
-  public createAllDynamicLists() {
-    this.configureListCreation();
-    this.FormListCreation();
-    this.tableListCreation();
-    this.equipmentListCreation();
+  public async createAllDynamicLists() {
+    try {
+      $("#configure").hide();
+      $(".progress_container").show();
+      // this.configureListCreation();
+      await this.FormListCreation();
+      await this.tableListCreation();
+      await this.equipmentListCreation();
+    } catch (error) {
+      console.error("Error configuring lists:", error);
+    }
   }
   public goToNewRequestForm() {
     this.setState({
@@ -335,7 +362,12 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       <>
         {this.state.Configure == true &&
           <div className='config'>
-            <img className='loader' style={{ display: "none" }} src={require("../img/loader-al.gif")} />
+            <div className="progress_container" style={{ display: "none" }}>
+              <div className="circular-progress">
+                <span className="progress-value">0%</span>
+              </div>
+            </div>
+            {/* <img className='loader' style={{ display: "none" }} src={require("../img/loader-al.gif")} /> */}
             <button type="button" id='configure' className="btn btn-primary" onClick={() => this.createAllDynamicLists()}>Click here to Configure</button>
           </div>
         }
