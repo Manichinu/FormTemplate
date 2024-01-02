@@ -118,7 +118,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       }, 1000);
     });
   }
-  public configureListCreation() {
+  public async configureListCreation() {
     try {
       const listTitle = "Configure Master";
       const listDescription = "Form Template";
@@ -258,6 +258,42 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       console.error("Error creating list:", error);
     }
   }
+  public async columnsMasterListCreation() {
+    var batch = NewWeb.createBatch();
+    var handler = this;
+    var ListColumns = [{ Name: "ColumnType", Type: "SingleLine" },
+    { Name: "RequestID", Type: "SingleLine" },
+    ]
+
+    try {
+      const listTitle = "Columns Master";
+      const listDescription = "Form Template";
+      NewWeb.lists.add(listTitle, listDescription, 100, false).then(() => {
+        console.log(`${listTitle} List created successfully`);
+        ListColumns.forEach(function (item, index) {
+          if (item.Type == "SingleLine") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addText(item.Name, 255, {
+              Group: "Custom Column",
+            }).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              handler.updateProgress(progress);
+            })
+          }
+        })
+        // Execute the batch
+        batch.execute().then(function () {
+          console.log("Columns Master List Batch operations completed successfully");
+        }).catch(function (error: any) {
+          console.log("Error in batch operations: " + error);
+        });
+
+      });
+    } catch (error) {
+      console.error("Error creating list:", error);
+    }
+  }
   public async equipmentListCreation() {
     var batch = NewWeb.createBatch();
     var handler = this;
@@ -321,7 +357,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     try {
       $("#configure").hide();
       $(".progress_container").show();
-      // this.configureListCreation();
+      await this.configureListCreation();
+      await this.columnsMasterListCreation();
       await this.FormListCreation();
       await this.tableListCreation();
       await this.equipmentListCreation();

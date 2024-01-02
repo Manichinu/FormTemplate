@@ -17,6 +17,7 @@ export interface ViewFormState {
     CurrentUserID: number;
     ShowDashboard: boolean;
     ShowViewForm: boolean;
+    NewFields: any[];
 }
 
 export default class ViewForm extends React.Component<IDashboardProps, ViewFormState, {}> {
@@ -27,14 +28,15 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             CurrentUserProfilePic: "",
             CurrentUserID: 0,
             ShowDashboard: false,
-            ShowViewForm: true
+            ShowViewForm: true,
+            NewFields: []
         };
         NewWeb = Web(this.props.siteurl);
         SessionID = this.props.itemId;
     }
     public componentDidMount() {
         this.GetCurrentLoggedUser();
-        this.getPermitRequestTransaction();
+        this.getDynamicColumns();
         this.getTableDetails();
         $(".cancel_btn").on('click', function () {
             location.reload();
@@ -80,6 +82,74 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             $("#no_of_workers").val(items[0].PlannedNoofWorkers);
             items[0].Contractor == true ? $("#contractor1").prop("checked", true) : $("#contractor2").prop("checked", true);
             items[0].WorkPlanning == true ? $("#planned1").prop("checked", true) : $("#planned2").prop("checked", true);
+            var DynamicFields = this.state.NewFields;
+            var item = items[0]
+            for (var i = 0; i < DynamicFields.length; i++) {
+                if (DynamicFields[i].ColumnType == "SingleLine") {
+                    var FieldValue = item[`${DynamicFields[i].Title + SessionID.replace("-", "")}`]
+                    var InputId = DynamicFields[i].Title + SessionID.replace("-", "");
+                    $("#" + InputId + "").val(FieldValue)
+                } else if (DynamicFields[i].ColumnType == "MultiLine") {
+                    var FieldValue = item[`${DynamicFields[i].Title + SessionID.replace("-", "")}`]
+                    var InputId = DynamicFields[i].Title + SessionID.replace("-", "");
+                    $("#" + InputId + "").text(FieldValue)
+                }
+                else if (DynamicFields[i].ColumnType == "Boolean") {
+                    var FieldValue = item[`${DynamicFields[i].Title + SessionID.replace("-", "")}`]
+                    var InputId = DynamicFields[i].Title + SessionID.replace("-", "");
+                    FieldValue == true ? $("#" + InputId + "").prop("checked", true) : $("#No-" + InputId + "").prop("checked", true);
+                }
+            }
+        })
+    }
+    public getDynamicColumns() {
+        NewWeb.lists.getByTitle("Columns Master").items.filter(`RequestID eq '${SessionID}'`).get().then((items: any) => {
+            if (items.length != 0) {
+                this.setState({
+                    NewFields: items
+                })
+                console.log(this.state.NewFields)
+                for (var i = 0; i < items.length; i++) {
+                    var FieldName = items[i].Title;
+                    var FieldType = items[i].ColumnType;
+                    var FieldID = FieldName + SessionID.replace("-", "");
+                    if (FieldType == "SingleLine") {
+                        $("#new_fields").append(`<div className="col-md-3">
+           <div className="form-group">
+               <label>${FieldName}</label>
+               <input type='text' id='${FieldID}' className="form-control" />           
+           </div>
+       </div>`)
+                    }
+                    else if (FieldType == "MultiLine") {
+                        $("#new_fields").append(`<div className="col-md-3">
+                <div className="form-group">
+                    <label>${FieldName}</label>
+                    <textarea id='${FieldID}' className="form-control" /></textarea>           
+                </div>
+            </div>`)
+                    }
+                    else if (FieldType == "Boolean") {
+                        $("#new_fields").append(` <div className="col-md-3 radio_block">
+    <div className="form-group">
+        <label>${FieldName}</label>
+        <div>
+            <div className="form-check">
+                <input className="form-check-input" type="radio" name="${FieldName}" id='${FieldID}' />
+                <label className="form-check-label" htmlFor="${FieldID}">Yes</label>
+            </div>
+            <div className="form-check">
+                <input className="form-check-input" type="radio" name="${FieldName}" id="No-${FieldID}" />
+                <label className="form-check-label" htmlFor="No-${FieldID}">No</label>
+            </div>
+        </div>
+    </div>
+    </div>`)
+                    }
+                }
+            }
+        }).then(() => {
+            this.getPermitRequestTransaction();
         })
     }
     public getTableDetails() {
@@ -391,6 +461,9 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                                                                 <p className='err-msg err-planning' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                             </div>
                                                         </div>
+                                                    </div>
+                                                    <div className="row" id='new_fields'>
+
                                                     </div>
                                                 </div>
                                                 <div className='permit-text'>
