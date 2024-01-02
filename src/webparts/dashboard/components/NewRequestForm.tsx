@@ -125,8 +125,34 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             RequestID: RequestID,
             Status: "Pending"
         }).then(() => {
-            Swal.fire('Submitted successfully!', '', 'success').then(() => {
-                location.reload();
+            NewWeb.lists.getByTitle("Form Master").items.filter(`RequestID eq '${RequestID}'`).get().then((items: any) => {
+                var Id = items[0].ID;
+                var FieldLength = $(".added_field").length;
+                for (var i = 0; i < FieldLength; i++) {
+                    var Type = $("#type" + i + "").text();
+                    var FieldName = $("#field_name" + i + "").text();
+                    var Column = FieldName + RequestID.replace("-", "");
+                    if (Type == "SingleLine") {
+                        var SLValue = $("#SingleLine" + i + "").val();
+                        NewWeb.lists.getByTitle("Form Master").items.getById(Id).update({
+                            [Column]: SLValue
+                        })
+                    } else if (Type == "MultiLine") {
+                        var MLValue = $("#MultiLine" + i + "").text();
+                        NewWeb.lists.getByTitle("Form Master").items.getById(Id).update({
+                            [Column]: MLValue
+                        })
+                    }
+                    else if (Type == "Boolean") {
+                        var BLValue = $("#Yes" + i + "").prop("checked");
+                        NewWeb.lists.getByTitle("Form Master").items.getById(Id).update({
+                            [Column]: BLValue
+                        })
+                    }
+                }
+                Swal.fire('Submitted successfully!', '', 'success').then(() => {
+                    location.reload();
+                })
             })
         })
     }
@@ -341,10 +367,11 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                 InputFieldCount: Count + 1
             })
             if (FieldType == "SingleLine") {
-                $("#dynamic_fields").append(`<div className="col-md-3">
-       <div className="form-group">
-           <label>${FieldName}</label>
-           <input type='text' id='SingleLine${Count}' className="form-control" />           
+                $("#dynamic_fields").append(`<div class="col-md-3 added_field">
+       <div class="form-group">
+           <label id='field_name${Count}'>${FieldName}</label>
+           <span id='type${Count}' style="display:none;">${FieldType}</span>
+           <input type='text' id='SingleLine${Count}' class="form-control" />           
        </div>
    </div>`)
                 var ColumnName = FieldName + RequestID.replace("-", "");
@@ -359,10 +386,11 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                 })
             }
             else if (FieldType == "MultiLine") {
-                $("#dynamic_fields").append(`<div className="col-md-3">
-            <div className="form-group">
-                <label>${FieldName}</label>
-                <textarea id='MultiLine${Count}' className="form-control" /></textarea>           
+                $("#dynamic_fields").append(`<div class="col-md-3 added_field">
+            <div class="form-group">
+                <label id='field_name${Count}'>${FieldName}</label>
+                <span id='type${Count}' style="display:none;">${FieldType}</span>
+                <textarea id='MultiLine${Count}' class="form-control" /></textarea>           
             </div>
         </div>`)
                 var ColumnName = FieldName + RequestID.replace("-", "");
@@ -377,17 +405,18 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                 })
             }
             else if (FieldType == "Boolean") {
-                $("#dynamic_fields").append(` <div className="col-md-3 radio_block">
-<div className="form-group">
-    <label>${FieldName}</label>
+                $("#dynamic_fields").append(` <div class="col-md-3 added_field radio_block">
+<div class="form-group">
+    <label id='field_name${Count}'>${FieldName}</label>
+    <span id='type${Count}' style="display:none;">${FieldType}</span>
     <div>
-        <div className="form-check">
-            <input className="form-check-input" type="radio" name="${FieldName}" id="Yes${Count}" />
-            <label className="form-check-label" htmlFor="Yes${Count}">Yes</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="${FieldName}" id="Yes${Count}" />
+            <label class="form-check-label" htmlFor="Yes${Count}">Yes</label>
         </div>
-        <div className="form-check">
-            <input className="form-check-input" type="radio" name="${FieldName}" id="No${Count}" />
-            <label className="form-check-label" htmlFor="No${Count}">No</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="${FieldName}" id="No${Count}" />
+            <label class="form-check-label" htmlFor="No${Count}">No</label>
         </div>
     </div>
 </div>

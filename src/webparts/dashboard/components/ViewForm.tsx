@@ -114,33 +114,33 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                     var FieldType = items[i].ColumnType;
                     var FieldID = FieldName + SessionID.replace("-", "");
                     if (FieldType == "SingleLine") {
-                        $("#new_fields").append(`<div className="col-md-3">
-           <div className="form-group">
+                        $("#new_fields").append(`<div class="col-md-3">
+           <div class="form-group">
                <label>${FieldName}</label>
-               <input type='text' id='${FieldID}' className="form-control" />           
+               <input type='text' id='${FieldID}' class="form-control" />           
            </div>
        </div>`)
                     }
                     else if (FieldType == "MultiLine") {
-                        $("#new_fields").append(`<div className="col-md-3">
-                <div className="form-group">
+                        $("#new_fields").append(`<div class="col-md-3">
+                <div class="form-group">
                     <label>${FieldName}</label>
-                    <textarea id='${FieldID}' className="form-control" /></textarea>           
+                    <textarea id='${FieldID}' class="form-control" /></textarea>           
                 </div>
             </div>`)
                     }
                     else if (FieldType == "Boolean") {
-                        $("#new_fields").append(` <div className="col-md-3 radio_block">
-    <div className="form-group">
+                        $("#new_fields").append(` <div class="col-md-3 radio_block">
+    <div class="form-group">
         <label>${FieldName}</label>
         <div>
-            <div className="form-check">
-                <input className="form-check-input" type="radio" name="${FieldName}" id='${FieldID}' />
-                <label className="form-check-label" htmlFor="${FieldID}">Yes</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="${FieldName}" id='${FieldID}' />
+                <label class="form-check-label" htmlFor="${FieldID}">Yes</label>
             </div>
-            <div className="form-check">
-                <input className="form-check-input" type="radio" name="${FieldName}" id="No-${FieldID}" />
-                <label className="form-check-label" htmlFor="No-${FieldID}">No</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="${FieldName}" id="No-${FieldID}" />
+                <label class="form-check-label" htmlFor="No-${FieldID}">No</label>
             </div>
         </div>
     </div>
