@@ -94,11 +94,11 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
 
     }
     public saveDetails() {
-        // if (this.formValidation()) {
-        this.savePermitRequestDetails();
-        this.saveLocationEquipmentDetails();
-        this.saveWorkPermitRequestDetails();
-        // }
+        if (this.formValidation()) {
+            this.savePermitRequestDetails();
+            this.saveLocationEquipmentDetails();
+            this.saveWorkPermitRequestDetails();
+        }
     }
     public savePermitRequestDetails() {
         var Contractor = $("#contractor1").prop("checked");

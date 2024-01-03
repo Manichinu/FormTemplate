@@ -19,6 +19,7 @@ import Swal from 'sweetalert2';
 
 let NewWeb: any;
 let progressEndValue = 100;
+let overAllValue = 0;
 
 export interface DashboardState {
   LoggedinuserName: string;
@@ -133,13 +134,17 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     }
   }
   public updateProgress(value: any) {
-    $(".progress-value").text(`${value}%`);
-    $(".circular-progress").css("background", `conic-gradient(#7d2ae8 ${value * 3.6}deg, #ededed 0deg)`);
-    if (value >= progressEndValue) {
+    overAllValue += value;
+    if (overAllValue >= progressEndValue) {
+      $(".progress-value").text(`100%`);
       Swal.fire('Configured successfully!', '', 'success').then(() => {
         location.reload();
       })
       $(".progress_container").hide();
+    } else {
+      $(".progress-value").text(`${overAllValue}%`);
+      console.log("Progress", overAllValue)
+      $(".circular-progress").css("background", `conic-gradient(#7d2ae8 ${overAllValue * 3.6}deg, #ededed 0deg)`);
     }
   }
   public async FormListCreation() {
@@ -176,7 +181,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -186,7 +191,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -194,7 +199,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -233,7 +238,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -241,7 +246,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -277,7 +282,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -320,7 +325,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -328,7 +333,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
@@ -336,7 +341,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil((index + 1) * 100 / ListColumns.length);
+              const progress = Math.ceil(1 * 100 / 34);
               handler.updateProgress(progress);
             })
           }
