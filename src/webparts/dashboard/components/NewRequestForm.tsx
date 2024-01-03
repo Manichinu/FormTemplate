@@ -94,11 +94,11 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
 
     }
     public saveDetails() {
-        if (this.formValidation()) {
-            this.savePermitRequestDetails();
-            this.saveLocationEquipmentDetails();
-            this.saveWorkPermitRequestDetails();
-        }
+        // if (this.formValidation()) {
+        this.savePermitRequestDetails();
+        this.saveLocationEquipmentDetails();
+        this.saveWorkPermitRequestDetails();
+        // }
     }
     public savePermitRequestDetails() {
         var Contractor = $("#contractor1").prop("checked");
@@ -124,36 +124,66 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             WorkPlanning: WorkPlanning,
             RequestID: RequestID,
             Status: "Pending"
-        }).then(() => {
-            NewWeb.lists.getByTitle("Form Master").items.filter(`RequestID eq '${RequestID}'`).get().then((items: any) => {
-                var Id = items[0].ID;
-                var FieldLength = $(".added_field").length;
-                for (var i = 0; i < FieldLength; i++) {
-                    var Type = $("#type" + i + "").text();
-                    var FieldName = $("#field_name" + i + "").text();
-                    var Column = FieldName + RequestID.replace("-", "");
-                    if (Type == "SingleLine") {
-                        var SLValue = $("#SingleLine" + i + "").val();
-                        NewWeb.lists.getByTitle("Form Master").items.getById(Id).update({
-                            [Column]: SLValue
-                        })
-                    } else if (Type == "MultiLine") {
-                        var MLValue = $("#MultiLine" + i + "").text();
-                        NewWeb.lists.getByTitle("Form Master").items.getById(Id).update({
-                            [Column]: MLValue
-                        })
+        }).then((addedItem: any) => {
+            // NewWeb.lists.getByTitle("Form Master").items.filter(`RequestID eq '${RequestID}'`).get().then((items: any) => {
+            console.log("Added", addedItem)
+            var itemsToUpdate: any = [];
+            var batch = NewWeb.createBatch();
+            var Id = addedItem.data.Id;
+            var FieldLength = $(".added_field").length;
+            for (var i = 0; i < FieldLength; i++) {
+                var Type = $("#type" + i + "").text();
+                var FieldName = $("#field_name" + i + "").text();
+                var Column = FieldName + RequestID.replace("-", "");
+                var item;
+                if (Type === "SingleLine") {
+                    var SLValue = $("#SingleLine" + i + "").val();
+                    item = {
+                        [Column]: SLValue,
                     }
-                    else if (Type == "Boolean") {
-                        var BLValue = $("#Yes" + i + "").prop("checked");
-                        NewWeb.lists.getByTitle("Form Master").items.getById(Id).update({
-                            [Column]: BLValue
-                        })
-                    }
+                    itemsToUpdate.push({
+                        item: item,
+                        id: Id
+                    })
                 }
+                else if (Type === "MultiLine") {
+                    var MLValue = $("#MultiLine" + i + "").val();
+                    item = {
+                        [Column]: MLValue,
+                    }
+                    itemsToUpdate.push({
+                        item: item,
+                        id: Id
+                    })
+                }
+                else if (Type === "Boolean") {
+                    var BLValue = $("#Yes" + i + "").prop("checked");
+                    item = {
+                        [Column]: BLValue,
+                    }
+                    itemsToUpdate.push({
+                        item: item,
+                        id: Id
+                    })
+                }
+            }
+            console.log(itemsToUpdate)
+            // Execute the batch operations
+            itemsToUpdate.forEach(function (items: any) {
+                NewWeb.lists.getByTitle("Form Master").items.getById(items.id).inBatch(batch).update(items.item)
+            });
+
+            // Execute the batch
+            batch.execute().then(function () {
                 Swal.fire('Submitted successfully!', '', 'success').then(() => {
                     location.reload();
                 })
-            })
+                console.log("Batch operations completed successfully");
+            }).catch(function (error: any) {
+                console.log("Error in batch operations: " + error);
+            });
+
+            // })
         })
     }
     public saveLocationEquipmentDetails() {
@@ -383,6 +413,8 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                         ColumnType: FieldType,
                         RequestID: RequestID
                     })
+                    $("#field_name").val("");
+                    $("#field_type").val("null");
                 })
             }
             else if (FieldType == "MultiLine") {
@@ -402,6 +434,8 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                         ColumnType: FieldType,
                         RequestID: RequestID
                     })
+                    $("#field_name").val("");
+                    $("#field_type").val("null");
                 })
             }
             else if (FieldType == "Boolean") {
@@ -428,6 +462,8 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                         ColumnType: FieldType,
                         RequestID: RequestID
                     })
+                    $("#field_name").val("");
+                    $("#field_type").val("null");
                 })
             }
         }
