@@ -231,7 +231,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                     <div>
                         <header>
                             <div className="container clearfix">
-                                <div className="logo">
+                                <div className="logo" onClick={() => this.goToDashboard()}>
                                     <a href="#"> <img src={require('../img/Logo.png')} alt="image" /> </a>
                                 </div>
                                 <div className="notification-part">

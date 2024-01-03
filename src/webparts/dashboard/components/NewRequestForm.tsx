@@ -103,6 +103,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
     public savePermitRequestDetails() {
         var Contractor = $("#contractor1").prop("checked");
         var WorkPlanning = $("#planned1").prop("checked");
+        var handler = this;
 
         NewWeb.lists.getByTitle("Form Master").items.add({
             Title: "Form",
@@ -176,7 +177,10 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             // Execute the batch
             batch.execute().then(function () {
                 Swal.fire('Submitted successfully!', '', 'success').then(() => {
-                    location.reload();
+                    handler.setState({
+                        ShowDashboard: true,
+                        ShowNewForm: false
+                    })
                 })
                 console.log("Batch operations completed successfully");
             }).catch(function (error: any) {
@@ -506,7 +510,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                     <div>
                         <header>
                             <div className="container clearfix">
-                                <div className="logo">
+                                <div className="logo" onClick={() => this.goToDashboard()}>
                                     <a href="#"> <img src={require('../img/Logo.png')} alt="image" /> </a>
                                 </div>
                                 <div className="notification-part">
