@@ -6,10 +6,12 @@ import { SPComponentLoader } from '@microsoft/sp-loader';
 import * as $ from 'jquery';
 import { Web } from '@pnp/sp/presets/all';
 import Dashboard from './Dashboard';
-
+import * as moment from "moment";
 
 let NewWeb: any;
 let SessionID: any;
+var InputCount = 0;
+var InternalNames: any = [];
 
 export interface ViewFormState {
     LoggedinuserName: string;
@@ -18,6 +20,7 @@ export interface ViewFormState {
     ShowDashboard: boolean;
     ShowViewForm: boolean;
     NewFields: any[];
+    FormInputs: any[];
 }
 
 export default class ViewForm extends React.Component<IDashboardProps, ViewFormState, {}> {
@@ -29,15 +32,18 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             CurrentUserID: 0,
             ShowDashboard: false,
             ShowViewForm: true,
-            NewFields: []
+            NewFields: [],
+            FormInputs: []
         };
         NewWeb = Web(this.props.siteurl);
         SessionID = this.props.itemId;
     }
     public componentDidMount() {
         this.GetCurrentLoggedUser();
-        this.getDynamicColumns();
-        this.getTableDetails();
+        this.getAllFields();
+        console.log(moment("2024-01-04T20:00:00Z").format("DD/MM/YYYY"))
+        // this.getDynamicColumns();
+        // this.getTableDetails();
         $(".cancel_btn").on('click', function () {
             location.reload();
         })
@@ -252,8 +258,42 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             console.log("Error in batch operations Work Permit Request Transaction: " + error);
         });
     }
-    public updateForm() {
-        this.saveWorkPermitRequestDetails();
+    public getAllFields() {
+        NewWeb.lists.getByTitle("Form Master").fields.get().then((results: any) => {
+            if (results.length > 0) {
+                this.setState({
+                    FormInputs: results
+                })
+                for (var i = 0; i < results.length; i++) {
+                    if (results[i].FromBaseType == false && results[i].InternalName != "_CommentFlags" && results[i].InternalName != "_CommentCount" && results[i].InternalName != "RequestID" && results[i].InternalName != "Status") {
+                        InternalNames.push({ Name: results[i].InternalName, Type: results[i].TypeDisplayName })
+                    }
+                }
+                console.log("Array", InternalNames)
+            }
+        }).then(() => {
+            this.getFormMasterTransaction();
+        })
+    }
+    public getFormMasterTransaction() {
+        NewWeb.lists.getByTitle("Form Master").items.filter(`RequestID eq '${SessionID}'`).get().then((items: any) => {
+            console.log(items)
+            InternalNames.forEach(function (val: any) {
+                if (val.Type == "Single line of text" || val.Type == "Number") {
+                    $(`.${val.Name}`).val(items[0][`${val.Name}`])
+                }
+                else if (val.Type == "Date and Time") {
+                    var formattedDate = moment(items[0][`${val.Name}`]).format("YYYY-MM-DD");
+                    $(`.${val.Name}`).val(formattedDate);
+                }
+                else if (val.Type == "Multiple lines of text") {
+                    $(`.${val.Name}`).text(items[0][`${val.Name}`])
+                }
+                else if (val.Type == "Yes/No") {
+                    items[0][`${val.Name}`] == true ? $(`.${val.Name}`).prop('checked', true) : $(`.no_${val.Name}`).prop('checked', true);
+                }
+            })
+        })
     }
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);
@@ -267,7 +307,77 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
         //   hasTeamsContext,
         //   userDisplayName
         // } = this.props;
-
+        const FormInputFields: any = this.state.FormInputs.map((item, index) => {
+            if (item.FromBaseType == false && item.InternalName != "_CommentFlags" && item.InternalName != "_CommentCount" && item.InternalName != "RequestID" && item.InternalName != "Status") {
+                InputCount += 1;
+                if (item.TypeDisplayName == "Single line of text") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>SingleLine</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type="text" id={`input_id${InputCount}`} className={`form-control ${item.InternalName}`} />
+                            </div>
+                        </div>
+                    )
+                } else if (item.TypeDisplayName == "Multiple lines of text") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>MultiLine</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <textarea className={`form-control ${item.InternalName}`} id={`input_id${InputCount}`} ></textarea>
+                            </div>
+                        </div>
+                    )
+                } else if (item.TypeDisplayName == "Number") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>Number</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type='text' className={`form-control ${item.InternalName}`} id={`input_id${InputCount}`} />
+                            </div>
+                        </div>
+                    )
+                }
+                else if (item.TypeDisplayName == "Date and Time") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>Date</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type='date' className={`form-control ${item.InternalName}`} id={`input_id${InputCount}`} />
+                            </div>
+                        </div>
+                    )
+                } else if (item.TypeDisplayName == "Yes/No") {
+                    return (
+                        <div className="col-md-3 radio_block form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>Boolean</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <div>
+                                    <div className="form-check">
+                                        <input className={`form-check-input ${item.InternalName}`} type="radio" name="contractor" id={`input_id${InputCount}`} />
+                                        <label className="form-check-label" htmlFor={`input_id${InputCount}`}>Yes</label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className={`form-check-input no_${item.InternalName}`} type="radio" name="contractor" id={`no_input_id${InputCount}`} />
+                                        <label className="form-check-label" htmlFor={`no_input_id${InputCount}`}>No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+            }
+        })
 
         return (
             <>
@@ -306,7 +416,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                                     <div className='clearfix wrapper-main'>
                                         <div className='section1 forms'>
                                             <h4>PERMIT REQUEST</h4>
-                                            <div className="form_block">
+                                            {/* <div className="form_block">
                                                 <div className="row">
                                                     <div className="col-md-3">
                                                         <div className="form-group">
@@ -386,11 +496,6 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
 
                                                         </tbody>
 
-                                                        {/* <tfoot>
-                          <tr className='final-row'>
-                            <td colSpan={7}> <div className="Add_new"> <a href="#" onClick={() => this.addNewRow()}> Add New </a></div></td>
-                          </tr>
-                        </tfoot> */}
 
                                                     </table>
                                                 </div>
@@ -534,6 +639,11 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
 
                                                         </table>
                                                     </div>
+                                                </div>
+                                            </div> */}
+                                            <div className="form_block">
+                                                <div className="row">
+                                                    {FormInputFields}
                                                 </div>
                                             </div>
                                             <div className="button">

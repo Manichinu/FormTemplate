@@ -12,6 +12,7 @@ import Dashboard from './Dashboard';
 
 let NewWeb: any;
 let RequestID = "";
+var InputCount = 0;
 
 export interface FormState {
     LoggedinuserName: string;
@@ -20,6 +21,7 @@ export interface FormState {
     ShowDashboard: boolean;
     ShowNewForm: boolean;
     InputFieldCount: number;
+    FormInputs: any[];
 }
 
 export default class NewRequestForm extends React.Component<IDashboardProps, FormState, {}> {
@@ -31,16 +33,18 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             CurrentUserID: 0,
             ShowDashboard: false,
             ShowNewForm: true,
-            InputFieldCount: 0
+            InputFieldCount: 0,
+            FormInputs: []
         };
         NewWeb = Web(this.props.siteurl);
     }
     public componentDidMount() {
         this.GetCurrentLoggedUser();
+        this.getAllFields();
         $(".cancel_btn").on('click', function () {
             location.reload();
         })
-        RequestID = "Session-" + moment().format("DDMMYYYYHHmmss");
+        // RequestID = "Session-" + moment().format("DDMMYYYYHHmmss");
     }
     private async GetCurrentLoggedUser() {
         await NewWeb.currentUser.get().then((user: any) => {
@@ -393,6 +397,74 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             ShowNewForm: false
         })
     }
+    public getAllFields() {
+        NewWeb.lists.getByTitle("Form Master").fields.get().then((results: any) => {
+            if (results.length > 0) {
+                this.setState({
+                    FormInputs: results
+                })
+            }
+        });
+    }
+    public saveInputValues() {
+        RequestID = "Session-" + moment().format("DDMMYYYYHHmmss");
+        var handler = this;
+        NewWeb.lists.getByTitle("Form Master").items.add({
+            Title: "Form",
+            RequestID: RequestID,
+            Status: "Pending"
+        }).then((addedItem: any) => {
+            console.log("Added", addedItem)
+            var Id = addedItem.data.Id;
+            var itemsToUpdate: any = [];
+            var batch = NewWeb.createBatch();
+            var InputFieldLength = $(".form_inputs").length;
+            for (var i = 0; i < InputFieldLength; i++) {
+                var Key = i + 1;
+                var FieldType = $("#type" + Key + "").text();
+                var FieldInternalName = $("#column" + Key + "").text();
+                var InputValue;
+                var item;
+                if (FieldType == "SingleLine" || FieldType == "MultiLine" || FieldType == "Number" || FieldType == "Date") {
+                    InputValue = $("#input_id" + Key + "").val();
+                    item = {
+                        [FieldInternalName]: InputValue,
+                    }
+                    itemsToUpdate.push({
+                        item: item,
+                        id: Id
+                    })
+                } else if (FieldType == "Boolean") {
+                    InputValue = $("#input_id" + Key + "").prop("checked");
+                    item = {
+                        [FieldInternalName]: InputValue,
+                    }
+                    itemsToUpdate.push({
+                        item: item,
+                        id: Id
+                    })
+                }
+
+            }
+            // Execute the batch operations
+            itemsToUpdate.forEach(function (items: any) {
+                NewWeb.lists.getByTitle("Form Master").items.getById(items.id).inBatch(batch).update(items.item)
+            });
+
+            // Execute the batch
+            batch.execute().then(function () {
+                Swal.fire('Submitted successfully!', '', 'success').then(() => {
+                    handler.setState({
+                        ShowDashboard: true,
+                        ShowNewForm: false
+                    })
+                })
+                console.log("Batch operations completed successfully");
+            }).catch(function (error: any) {
+                console.log("Error in batch operations: " + error);
+            });
+        })
+    }
 
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);
@@ -406,7 +478,77 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
         //   hasTeamsContext,
         //   userDisplayName
         // } = this.props;
-
+        const FormInputFields: any = this.state.FormInputs.map((item, index) => {
+            if (item.FromBaseType == false && item.InternalName != "_CommentFlags" && item.InternalName != "_CommentCount" && item.InternalName != "RequestID" && item.InternalName != "Status") {
+                InputCount += 1;
+                if (item.TypeDisplayName == "Single line of text") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>SingleLine</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type="text" id={`input_id${InputCount}`} className="form-control" />
+                            </div>
+                        </div>
+                    )
+                } else if (item.TypeDisplayName == "Multiple lines of text") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>MultiLine</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <textarea className="form-control" id={`input_id${InputCount}`} ></textarea>
+                            </div>
+                        </div>
+                    )
+                } else if (item.TypeDisplayName == "Number") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>Number</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type='text' className="form-control" id={`input_id${InputCount}`} />
+                            </div>
+                        </div>
+                    )
+                }
+                else if (item.TypeDisplayName == "Date and Time") {
+                    return (
+                        <div className="col-md-3 form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>Date</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type='date' className="form-control" id={`input_id${InputCount}`} />
+                            </div>
+                        </div>
+                    )
+                } else if (item.TypeDisplayName == "Yes/No") {
+                    return (
+                        <div className="col-md-3 radio_block form_inputs">
+                            <div className="form-group">
+                                <label>{item.Title}</label>
+                                <p id={`type${InputCount}`} style={{ display: "none" }}>Boolean</p>
+                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <div>
+                                    <div className="form-check">
+                                        <input className="form-check-input contractor" type="radio" name="contractor" id={`input_id${InputCount}`} />
+                                        <label className="form-check-label" htmlFor={`input_id${InputCount}`}>Yes</label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input className="form-check-input contractor" type="radio" name="contractor" id={`no_input_id${InputCount}`} />
+                                        <label className="form-check-label" htmlFor={`no_input_id${InputCount}`}>No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+            }
+        })
 
         return (
             <>
@@ -445,7 +587,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                     <div className='clearfix wrapper-main'>
                                         <div className='section1 forms'>
                                             <h4>PERMIT REQUEST</h4>
-                                            <div className="form_block">
+                                            {/* <div className="form_block">
                                                 <div className="row">
                                                     <div className="col-md-3">
                                                         <div className="form-group">
@@ -525,11 +667,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
 
                                                         </tbody>
 
-                                                        {/* <tfoot>
-                          <tr className='final-row'>
-                            <td colSpan={7}> <div className="Add_new"> <a href="#" onClick={() => this.addNewRow()}> Add New </a></div></td>
-                          </tr>
-                        </tfoot> */}
+                        
 
                                                     </table>
                                                 </div>
@@ -676,9 +814,14 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                                         </table>
                                                     </div>
                                                 </div>
+                                            </div> */}
+                                            <div className="form_block">
+                                                <div className="row">
+                                                    {FormInputFields}
+                                                </div>
                                             </div>
                                             <div className="button">
-                                                <button className="submit_btn" onClick={() => this.saveDetails()}> Submit </button>
+                                                <button className="submit_btn" onClick={() => this.saveInputValues()}> Submit </button>
                                                 <button className="cancel_btn"> Cancel </button>
                                             </div>
                                         </div>

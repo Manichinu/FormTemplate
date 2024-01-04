@@ -14,12 +14,11 @@ import 'datatables.net-buttons/js/dataTables.buttons.min';
 import 'datatables.net-buttons/js/buttons.flash.min';
 import 'datatables.net-buttons/js/buttons.html5.min';
 import Swal from 'sweetalert2';
-import * as moment from "moment";
+// import * as moment from "moment";
 
 
 let NewWeb: any;
 var Count = 0;
-let RequestID = "";
 // let SessionID: any;
 
 export interface EditFieldsState {
@@ -59,7 +58,6 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
         $(".cancel_btn").on('click', function () {
             location.reload();
         })
-        RequestID = "Session-" + moment().format("DDMMYYYYHHmmss");
     }
     private async GetCurrentLoggedUser() {
         await NewWeb.currentUser.get().then((user: any) => {
@@ -128,6 +126,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
     }
     public editField(item: any) {
         $(".update_btn").show()
+        $("#add_field").hide()
         $("#field_name").val(item.Title);
         this.setState({
             InternalName: item.InternalName
@@ -139,88 +138,154 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
             Count = 0;
             Swal.fire('Updated successfully!', '', 'success').then(() => {
                 this.getAllFields();
+                $("#add_field").show()
                 $(".update_btn").hide()
                 $("#field_name").val("")
             });
         })
     }
+    //     public addInputField() {
+    //         if (this.dynamicFieldValidation()) {
+    //             var FieldName: any = $("#field_name").val();
+    //             var FieldType = $("#field_type").val();
+    //             var Count = this.state.InputFieldCount
+    //             this.setState({
+    //                 InputFieldCount: Count + 1
+    //             })
+    //             var TrimmedText = FieldName.replace(/\s+/g, '').trim()
+    //             if (FieldType == "SingleLine") {
+    //                 $("#dynamic_fields").append(`<div class="col-md-3 added_field">
+    //        <div class="form-group">
+    //            <label id='field_name${Count}'>${FieldName}</label>
+    //            <span id='type${Count}' style="display:none;">${FieldType}</span>
+    //            <input type='text' id='SingleLine${Count}' class="form-control" />           
+    //        </div>
+    //    </div>`)
+    //                 var ColumnName = TrimmedText + RequestID.replace("-", "");
+    //                 NewWeb.lists.getByTitle("Form Master").fields.addText(ColumnName, 255, {
+    //                     Group: "Custom Column",
+    //                 }).then(() => {
+    //                     NewWeb.lists.getByTitle("Columns Master").items.add({
+    //                         Title: FieldName,
+    //                         ColumnType: FieldType,
+    //                         RequestID: RequestID
+    //                     })
+    //                     $("#field_name").val("");
+    //                     $("#field_type").val("null");
+    //                 })
+    //             }
+    //             else if (FieldType == "MultiLine") {
+    //                 $("#dynamic_fields").append(`<div class="col-md-3 added_field">
+    //             <div class="form-group">
+    //                 <label id='field_name${Count}'>${FieldName}</label>
+    //                 <span id='type${Count}' style="display:none;">${FieldType}</span>
+    //                 <textarea id='MultiLine${Count}' class="form-control" /></textarea>           
+    //             </div>
+    //         </div>`)
+    //                 var ColumnName = TrimmedText + RequestID.replace("-", "");
+    //                 NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(ColumnName, 255, true, false, false, true, {
+    //                     Group: "Custom Column",
+    //                 }).then(() => {
+    //                     NewWeb.lists.getByTitle("Columns Master").items.add({
+    //                         Title: FieldName,
+    //                         ColumnType: FieldType,
+    //                         RequestID: RequestID
+    //                     })
+    //                     $("#field_name").val("");
+    //                     $("#field_type").val("null");
+    //                 })
+    //             }
+    //             else if (FieldType == "Boolean") {
+    //                 $("#dynamic_fields").append(` <div class="col-md-3 added_field radio_block">
+    // <div class="form-group">
+    //     <label id='field_name${Count}'>${FieldName}</label>
+    //     <span id='type${Count}' style="display:none;">${FieldType}</span>
+    //     <div>
+    //         <div class="form-check">
+    //             <input class="form-check-input" type="radio" name="${FieldName}" id="Yes${Count}" />
+    //             <label class="form-check-label" htmlFor="Yes${Count}">Yes</label>
+    //         </div>
+    //         <div class="form-check">
+    //             <input class="form-check-input" type="radio" name="${FieldName}" id="No${Count}" />
+    //             <label class="form-check-label" htmlFor="No${Count}">No</label>
+    //         </div>
+    //     </div>
+    // </div>
+    // </div>`)
+    //                 var ColumnName = TrimmedText + RequestID.replace("-", "");
+    //                 NewWeb.lists.getByTitle("Form Master").fields.addBoolean(ColumnName).then(() => {
+    //                     NewWeb.lists.getByTitle("Columns Master").items.add({
+    //                         Title: FieldName,
+    //                         ColumnType: FieldType,
+    //                         RequestID: RequestID
+    //                     })
+    //                     $("#field_name").val("");
+    //                     $("#field_type").val("null");
+    //                 })
+    //             }
+    //         }
+    //     }
     public addInputField() {
         if (this.dynamicFieldValidation()) {
             var FieldName: any = $("#field_name").val();
             var FieldType = $("#field_type").val();
-            var Count = this.state.InputFieldCount
-            this.setState({
-                InputFieldCount: Count + 1
-            })
-            var TrimmedText = FieldName.replace(/\s+/g, '').trim()
             if (FieldType == "SingleLine") {
-                $("#dynamic_fields").append(`<div class="col-md-3 added_field">
-       <div class="form-group">
-           <label id='field_name${Count}'>${FieldName}</label>
-           <span id='type${Count}' style="display:none;">${FieldType}</span>
-           <input type='text' id='SingleLine${Count}' class="form-control" />           
-       </div>
-   </div>`)
-                var ColumnName = TrimmedText + RequestID.replace("-", "");
-                NewWeb.lists.getByTitle("Form Master").fields.addText(ColumnName, 255, {
+                NewWeb.lists.getByTitle("Form Master").fields.addText(FieldName, 255, {
                     Group: "Custom Column",
                 }).then(() => {
-                    NewWeb.lists.getByTitle("Columns Master").items.add({
-                        Title: FieldName,
-                        ColumnType: FieldType,
-                        RequestID: RequestID
+                    Count = 0;
+                    Swal.fire('Field added successfully!', '', 'success').then(() => {
+                        $("#field_name").val("");
+                        $("#field_type").val("null");
+                        this.getAllFields();
                     })
-                    $("#field_name").val("");
-                    $("#field_type").val("null");
+                    console.log(`${FieldName} column added successfully`)
                 })
             }
             else if (FieldType == "MultiLine") {
-                $("#dynamic_fields").append(`<div class="col-md-3 added_field">
-            <div class="form-group">
-                <label id='field_name${Count}'>${FieldName}</label>
-                <span id='type${Count}' style="display:none;">${FieldType}</span>
-                <textarea id='MultiLine${Count}' class="form-control" /></textarea>           
-            </div>
-        </div>`)
-                var ColumnName = TrimmedText + RequestID.replace("-", "");
-                NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(ColumnName, 255, true, false, false, true, {
+                NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(FieldName, 255, true, false, false, true, {
                     Group: "Custom Column",
                 }).then(() => {
-                    NewWeb.lists.getByTitle("Columns Master").items.add({
-                        Title: FieldName,
-                        ColumnType: FieldType,
-                        RequestID: RequestID
+                    Count = 0;
+                    Swal.fire('Field added successfully!', '', 'success').then(() => {
+                        $("#field_name").val("");
+                        $("#field_type").val("null");
+                        this.getAllFields();
                     })
-                    $("#field_name").val("");
-                    $("#field_type").val("null");
+                    console.log(`${FieldName} column added successfully`)
                 })
             }
             else if (FieldType == "Boolean") {
-                $("#dynamic_fields").append(` <div class="col-md-3 added_field radio_block">
-<div class="form-group">
-    <label id='field_name${Count}'>${FieldName}</label>
-    <span id='type${Count}' style="display:none;">${FieldType}</span>
-    <div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="${FieldName}" id="Yes${Count}" />
-            <label class="form-check-label" htmlFor="Yes${Count}">Yes</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="${FieldName}" id="No${Count}" />
-            <label class="form-check-label" htmlFor="No${Count}">No</label>
-        </div>
-    </div>
-</div>
-</div>`)
-                var ColumnName = TrimmedText + RequestID.replace("-", "");
-                NewWeb.lists.getByTitle("Form Master").fields.addBoolean(ColumnName).then(() => {
-                    NewWeb.lists.getByTitle("Columns Master").items.add({
-                        Title: FieldName,
-                        ColumnType: FieldType,
-                        RequestID: RequestID
+                NewWeb.lists.getByTitle("Form Master").fields.addBoolean(FieldName).then(() => {
+                    Count = 0;
+                    Swal.fire('Field added successfully!', '', 'success').then(() => {
+                        $("#field_name").val("");
+                        $("#field_type").val("null");
+                        this.getAllFields();
                     })
-                    $("#field_name").val("");
-                    $("#field_type").val("null");
+                    console.log(`${FieldName} column added successfully`)
+                })
+            }
+            else if (FieldType == "Number") {
+                NewWeb.lists.getByTitle("Form Master").fields.addNumber(FieldName).then(() => {
+                    Count = 0;
+                    Swal.fire('Field added successfully!', '', 'success').then(() => {
+                        $("#field_name").val("");
+                        $("#field_type").val("null");
+                        this.getAllFields();
+                    })
+                    console.log(`${FieldName} column added successfully`)
+                })
+            }
+            else if (FieldType == "Date") {
+                NewWeb.lists.getByTitle("Form Master").fields.addDateTime(FieldName).then(() => {
+                    Count = 0;
+                    Swal.fire('Field added successfully!', '', 'success').then(() => {
+                        $("#field_name").val("");
+                        $("#field_type").val("null");
+                        this.getAllFields();
+                    })
+                    console.log(`${FieldName} column added successfully`)
                 })
             }
         }
@@ -257,7 +322,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
         //   userDisplayName
         // } = this.props;
         const Fields: any = this.state.ListFields.map((item, index) => {
-            if (item.FromBaseType == false && item.InternalName != "_CommentFlags" && item.InternalName != "_CommentCount" && item.InternalName != "RequestID") {
+            if (item.FromBaseType == false && item.InternalName != "_CommentFlags" && item.InternalName != "_CommentCount" && item.InternalName != "RequestID" && item.InternalName != "Status") {
                 Count += 1;
                 return (
                     <tr>
@@ -331,7 +396,6 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
 
                                         </div>
                                         <div>
-                                            <button onClick={() => this.addInputField()}>Add Field</button>
                                             <div className="form_block">
                                                 <div className="row">
                                                     <div className="col-md-3">
@@ -349,11 +413,14 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                                                                 <option value="SingleLine">SingleLine</option>
                                                                 <option value="MultiLine">MultiLine</option>
                                                                 <option value="Boolean">Boolean</option>
+                                                                <option value="Number">Number</option>
+                                                                <option value="Date">Date</option>
                                                             </select>
                                                             <p className='err-msg err_field_type' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <button id='add_field' onClick={() => this.addInputField()}>Add Field</button>
                                             </div>
                                             <div className="button update_btn" style={{ display: "none" }}>
                                                 <button className="submit_btn" onClick={() => this.updateField()}> Update </button>
