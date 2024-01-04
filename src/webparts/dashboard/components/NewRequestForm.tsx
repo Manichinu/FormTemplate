@@ -135,7 +135,8 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             for (var i = 0; i < FieldLength; i++) {
                 var Type = $("#type" + i + "").text();
                 var FieldName = $("#field_name" + i + "").text();
-                var Column = FieldName + RequestID.replace("-", "");
+                var TrimmedText = FieldName.replace(/\s+/g, '').trim()
+                var Column = TrimmedText + RequestID.replace("-", "");
                 var item;
                 if (Type === "SingleLine") {
                     var SLValue = $("#SingleLine" + i + "").val();
@@ -394,12 +395,13 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
     }
     public addInputField() {
         if (this.dynamicFieldValidation()) {
-            var FieldName = $("#field_name").val();
+            var FieldName: any = $("#field_name").val();
             var FieldType = $("#field_type").val();
             var Count = this.state.InputFieldCount
             this.setState({
                 InputFieldCount: Count + 1
             })
+            var TrimmedText = FieldName.replace(/\s+/g, '').trim()
             if (FieldType == "SingleLine") {
                 $("#dynamic_fields").append(`<div class="col-md-3 added_field">
        <div class="form-group">
@@ -408,7 +410,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
            <input type='text' id='SingleLine${Count}' class="form-control" />           
        </div>
    </div>`)
-                var ColumnName = FieldName + RequestID.replace("-", "");
+                var ColumnName = TrimmedText + RequestID.replace("-", "");
                 NewWeb.lists.getByTitle("Form Master").fields.addText(ColumnName, 255, {
                     Group: "Custom Column",
                 }).then(() => {
@@ -429,7 +431,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                 <textarea id='MultiLine${Count}' class="form-control" /></textarea>           
             </div>
         </div>`)
-                var ColumnName = FieldName + RequestID.replace("-", "");
+                var ColumnName = TrimmedText + RequestID.replace("-", "");
                 NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(ColumnName, 255, true, false, false, true, {
                     Group: "Custom Column",
                 }).then(() => {
@@ -459,7 +461,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
     </div>
 </div>
 </div>`)
-                var ColumnName = FieldName + RequestID.replace("-", "");
+                var ColumnName = TrimmedText + RequestID.replace("-", "");
                 NewWeb.lists.getByTitle("Form Master").fields.addBoolean(ColumnName).then(() => {
                     NewWeb.lists.getByTitle("Columns Master").items.add({
                         Title: FieldName,

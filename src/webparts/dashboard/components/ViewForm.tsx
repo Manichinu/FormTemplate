@@ -85,18 +85,20 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             var DynamicFields = this.state.NewFields;
             var item = items[0]
             for (var i = 0; i < DynamicFields.length; i++) {
+                var Title = DynamicFields[i].Title;
+                var TrimmedText = Title.replace(/\s+/g, '').trim()
                 if (DynamicFields[i].ColumnType == "SingleLine") {
-                    var FieldValue = item[`${DynamicFields[i].Title + SessionID.replace("-", "")}`]
-                    var InputId = DynamicFields[i].Title + SessionID.replace("-", "");
+                    var FieldValue = item[`${TrimmedText + SessionID.replace("-", "")}`]
+                    var InputId = TrimmedText + SessionID.replace("-", "");
                     $("#" + InputId + "").val(FieldValue)
                 } else if (DynamicFields[i].ColumnType == "MultiLine") {
-                    var FieldValue = item[`${DynamicFields[i].Title + SessionID.replace("-", "")}`]
-                    var InputId = DynamicFields[i].Title + SessionID.replace("-", "");
+                    var FieldValue = item[`${TrimmedText + SessionID.replace("-", "")}`]
+                    var InputId = TrimmedText + SessionID.replace("-", "");
                     $("#" + InputId + "").text(FieldValue)
                 }
                 else if (DynamicFields[i].ColumnType == "Boolean") {
-                    var FieldValue = item[`${DynamicFields[i].Title + SessionID.replace("-", "")}`]
-                    var InputId = DynamicFields[i].Title + SessionID.replace("-", "");
+                    var FieldValue = item[`${TrimmedText + SessionID.replace("-", "")}`]
+                    var InputId = TrimmedText + SessionID.replace("-", "");
                     FieldValue == true ? $("#" + InputId + "").prop("checked", true) : $("#No-" + InputId + "").prop("checked", true);
                 }
             }
@@ -112,7 +114,8 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                 for (var i = 0; i < items.length; i++) {
                     var FieldName = items[i].Title;
                     var FieldType = items[i].ColumnType;
-                    var FieldID = FieldName + SessionID.replace("-", "");
+                    var TrimmedText = FieldName.replace(/\s+/g, '').trim()
+                    var FieldID = TrimmedText + SessionID.replace("-", "");
                     if (FieldType == "SingleLine") {
                         $("#new_fields").append(`<div class="col-md-3">
            <div class="form-group">
