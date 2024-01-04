@@ -12,7 +12,7 @@ import Dashboard from './Dashboard';
 
 let NewWeb: any;
 let RequestID = "";
-var InputCount = 0;
+
 
 export interface FormState {
     LoggedinuserName: string;
@@ -22,6 +22,7 @@ export interface FormState {
     ShowNewForm: boolean;
     InputFieldCount: number;
     FormInputs: any[];
+    InputCount: number;
 }
 
 export default class NewRequestForm extends React.Component<IDashboardProps, FormState, {}> {
@@ -34,7 +35,8 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             ShowDashboard: false,
             ShowNewForm: true,
             InputFieldCount: 0,
-            FormInputs: []
+            FormInputs: [],
+            InputCount: 0
         };
         NewWeb = Web(this.props.siteurl);
     }
@@ -478,6 +480,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
         //   hasTeamsContext,
         //   userDisplayName
         // } = this.props;
+        var InputCount = 0;
         const FormInputFields: any = this.state.FormInputs.map((item, index) => {
             if (item.FromBaseType == false && item.InternalName != "_CommentFlags" && item.InternalName != "_CommentCount" && item.InternalName != "RequestID" && item.InternalName != "Status") {
                 InputCount += 1;

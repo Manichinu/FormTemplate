@@ -7,10 +7,12 @@ import * as $ from 'jquery';
 import { Web } from '@pnp/sp/presets/all';
 import Dashboard from './Dashboard';
 import * as moment from "moment";
+import Swal from 'sweetalert2';
+
 
 let NewWeb: any;
 let SessionID: any;
-var InputCount = 0;
+// var FieldCount = 0;
 var InternalNames: any = [];
 
 export interface ViewFormState {
@@ -21,6 +23,8 @@ export interface ViewFormState {
     ShowViewForm: boolean;
     NewFields: any[];
     FormInputs: any[];
+    ItemId: number;
+    FieldCount: number;
 }
 
 export default class ViewForm extends React.Component<IDashboardProps, ViewFormState, {}> {
@@ -33,7 +37,9 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             ShowDashboard: false,
             ShowViewForm: true,
             NewFields: [],
-            FormInputs: []
+            FormInputs: [],
+            ItemId: 0,
+            FieldCount: 0
         };
         NewWeb = Web(this.props.siteurl);
         SessionID = this.props.itemId;
@@ -278,6 +284,9 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
     public getFormMasterTransaction() {
         NewWeb.lists.getByTitle("Form Master").items.filter(`RequestID eq '${SessionID}'`).get().then((items: any) => {
             console.log(items)
+            this.setState({
+                ItemId: items[0].ID
+            })
             InternalNames.forEach(function (val: any) {
                 if (val.Type == "Single line of text" || val.Type == "Number") {
                     $(`.${val.Name}`).val(items[0][`${val.Name}`])
@@ -295,6 +304,57 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             })
         })
     }
+    public updateFormTransaction() {
+        var handler = this;
+        var Id = this.state.ItemId;
+        var itemsToUpdate: any = [];
+        var batch = NewWeb.createBatch();
+        var InputFieldLength = $(".form_inputs").length;
+        for (var i = 0; i < InputFieldLength; i++) {
+            var Key = i + 1;
+            var FieldType = $("#type" + Key + "").text();
+            var FieldInternalName = $("#column" + Key + "").text();
+            var InputValue;
+            var item;
+            if (FieldType == "SingleLine" || FieldType == "MultiLine" || FieldType == "Number" || FieldType == "Date") {
+                InputValue = $("#input_id" + Key + "").val();
+                item = {
+                    [FieldInternalName]: InputValue,
+                }
+                itemsToUpdate.push({
+                    item: item,
+                    id: Id
+                })
+            } else if (FieldType == "Boolean") {
+                InputValue = $("#input_id" + Key + "").prop("checked");
+                item = {
+                    [FieldInternalName]: InputValue,
+                }
+                itemsToUpdate.push({
+                    item: item,
+                    id: Id
+                })
+            }
+
+        }
+        // Execute the batch operations
+        itemsToUpdate.forEach(function (items: any) {
+            NewWeb.lists.getByTitle("Form Master").items.getById(items.id).inBatch(batch).update(items.item)
+        });
+
+        // Execute the batch
+        batch.execute().then(function () {
+            Swal.fire('Updated successfully!', '', 'success').then(() => {
+                handler.setState({
+                    ShowDashboard: true,
+                    ShowViewForm: false
+                })
+            })
+            console.log("Batch operations completed successfully");
+        }).catch(function (error: any) {
+            console.log("Error in batch operations: " + error);
+        });
+    }
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);
         SPComponentLoader.loadScript(`https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js`);
@@ -307,17 +367,18 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
         //   hasTeamsContext,
         //   userDisplayName
         // } = this.props;
+        var FieldCount = 0;
         const FormInputFields: any = this.state.FormInputs.map((item, index) => {
             if (item.FromBaseType == false && item.InternalName != "_CommentFlags" && item.InternalName != "_CommentCount" && item.InternalName != "RequestID" && item.InternalName != "Status") {
-                InputCount += 1;
+                FieldCount += 1;
                 if (item.TypeDisplayName == "Single line of text") {
                     return (
                         <div className="col-md-3 form_inputs">
                             <div className="form-group">
                                 <label>{item.Title}</label>
-                                <p id={`type${InputCount}`} style={{ display: "none" }}>SingleLine</p>
-                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
-                                <input type="text" id={`input_id${InputCount}`} className={`form-control ${item.InternalName}`} />
+                                <p id={`type${FieldCount}`} style={{ display: "none" }}>SingleLine</p>
+                                <p id={`column${FieldCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type="text" id={`input_id${FieldCount}`} className={`form-control ${item.InternalName}`} />
                             </div>
                         </div>
                     )
@@ -326,9 +387,9 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                         <div className="col-md-3 form_inputs">
                             <div className="form-group">
                                 <label>{item.Title}</label>
-                                <p id={`type${InputCount}`} style={{ display: "none" }}>MultiLine</p>
-                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
-                                <textarea className={`form-control ${item.InternalName}`} id={`input_id${InputCount}`} ></textarea>
+                                <p id={`type${FieldCount}`} style={{ display: "none" }}>MultiLine</p>
+                                <p id={`column${FieldCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <textarea className={`form-control ${item.InternalName}`} id={`input_id${FieldCount}`} ></textarea>
                             </div>
                         </div>
                     )
@@ -337,9 +398,9 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                         <div className="col-md-3 form_inputs">
                             <div className="form-group">
                                 <label>{item.Title}</label>
-                                <p id={`type${InputCount}`} style={{ display: "none" }}>Number</p>
-                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
-                                <input type='text' className={`form-control ${item.InternalName}`} id={`input_id${InputCount}`} />
+                                <p id={`type${FieldCount}`} style={{ display: "none" }}>Number</p>
+                                <p id={`column${FieldCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type='text' className={`form-control ${item.InternalName}`} id={`input_id${FieldCount}`} />
                             </div>
                         </div>
                     )
@@ -349,9 +410,9 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                         <div className="col-md-3 form_inputs">
                             <div className="form-group">
                                 <label>{item.Title}</label>
-                                <p id={`type${InputCount}`} style={{ display: "none" }}>Date</p>
-                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
-                                <input type='date' className={`form-control ${item.InternalName}`} id={`input_id${InputCount}`} />
+                                <p id={`type${FieldCount}`} style={{ display: "none" }}>Date</p>
+                                <p id={`column${FieldCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <input type='date' className={`form-control ${item.InternalName}`} id={`input_id${FieldCount}`} />
                             </div>
                         </div>
                     )
@@ -360,16 +421,16 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                         <div className="col-md-3 radio_block form_inputs">
                             <div className="form-group">
                                 <label>{item.Title}</label>
-                                <p id={`type${InputCount}`} style={{ display: "none" }}>Boolean</p>
-                                <p id={`column${InputCount}`} style={{ display: "none" }}>{item.InternalName}</p>
+                                <p id={`type${FieldCount}`} style={{ display: "none" }}>Boolean</p>
+                                <p id={`column${FieldCount}`} style={{ display: "none" }}>{item.InternalName}</p>
                                 <div>
                                     <div className="form-check">
-                                        <input className={`form-check-input ${item.InternalName}`} type="radio" name="contractor" id={`input_id${InputCount}`} />
-                                        <label className="form-check-label" htmlFor={`input_id${InputCount}`}>Yes</label>
+                                        <input className={`form-check-input ${item.InternalName}`} type="radio" name="contractor" id={`input_id${FieldCount}`} />
+                                        <label className="form-check-label" htmlFor={`input_id${FieldCount}`}>Yes</label>
                                     </div>
                                     <div className="form-check">
-                                        <input className={`form-check-input no_${item.InternalName}`} type="radio" name="contractor" id={`no_input_id${InputCount}`} />
-                                        <label className="form-check-label" htmlFor={`no_input_id${InputCount}`}>No</label>
+                                        <input className={`form-check-input no_${item.InternalName}`} type="radio" name="contractor" id={`no_input_id${FieldCount}`} />
+                                        <label className="form-check-label" htmlFor={`no_input_id${FieldCount}`}>No</label>
                                     </div>
                                 </div>
                             </div>
@@ -647,7 +708,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                                                 </div>
                                             </div>
                                             <div className="button">
-                                                <button className="submit_btn"> Update </button>
+                                                <button className="submit_btn" onClick={() => this.updateFormTransaction()}> Update </button>
                                                 <button className="cancel_btn"> Cancel </button>
                                             </div>
                                         </div>
