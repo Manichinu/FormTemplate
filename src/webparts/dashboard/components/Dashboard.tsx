@@ -16,6 +16,7 @@ import 'datatables.net-buttons/js/buttons.flash.min';
 import 'datatables.net-buttons/js/buttons.html5.min';
 import ViewForm from './ViewForm';
 import Swal from 'sweetalert2';
+import EditFields from './EditFields';
 
 let NewWeb: any;
 let progressEndValue = 100;
@@ -33,6 +34,7 @@ export interface DashboardState {
   ApprovedStatusCount: number;
   PendingStatusCount: number;
   Configure: boolean;
+  ShowEditFields: boolean;
 }
 export default class Dashboard extends React.Component<IDashboardProps, DashboardState, {}> {
   public constructor(props: IDashboardProps, state: DashboardState) {
@@ -48,7 +50,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       ViewFormID: "",
       ApprovedStatusCount: 0,
       PendingStatusCount: 0,
-      Configure: false
+      Configure: false,
+      ShowEditFields: false
     };
     SPComponentLoader.loadScript(`https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js`);
     SPComponentLoader.loadCss(`https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css`);
@@ -135,6 +138,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
   }
   public updateProgress(value: any) {
     overAllValue += value;
+    console.log("Progress", overAllValue)
     if (overAllValue >= progressEndValue) {
       $(".progress-value").text(`100%`);
       Swal.fire('Configured successfully!', '', 'success').then(() => {
@@ -142,9 +146,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       })
       $(".progress_container").hide();
     } else {
-      $(".progress-value").text(`${overAllValue}%`);
-      console.log("Progress", overAllValue)
-      $(".circular-progress").css("background", `conic-gradient(#7d2ae8 ${overAllValue * 3.6}deg, #ededed 0deg)`);
+      $(".progress-value").text(`${Math.ceil(overAllValue)}%`);
+      $(".circular-progress").css("background", `conic-gradient(#7d2ae8 ${Math.ceil(overAllValue) * 3.6}deg, #ededed 0deg)`);
     }
   }
   public async FormListCreation() {
@@ -181,7 +184,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -191,7 +194,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -199,7 +202,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -238,7 +241,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -246,7 +249,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -282,7 +285,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -290,6 +293,64 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
         // Execute the batch
         batch.execute().then(function () {
           console.log("Columns Master List Batch operations completed successfully");
+        }).catch(function (error: any) {
+          console.log("Error in batch operations: " + error);
+        });
+
+      });
+    } catch (error) {
+      console.error("Error creating list:", error);
+    }
+  }
+  public async workFlowListCreation() {
+    var batch = NewWeb.createBatch();
+    var handler = this;
+    var ListColumns = [{ Name: "AssignedBy", Type: "User" },
+    { Name: "AssignedTo", Type: "User" },
+    { Name: "ApprovedBy", Type: "User" },
+    { Name: "RequestID", Type: "SingleLine" },
+    { Name: "Comments", Type: "MultiLine" },
+    { Name: "Status", Type: "SingleLine" },
+    ]
+
+    try {
+      const listTitle = "WorkFlow History";
+      const listDescription = "Form Template";
+      NewWeb.lists.add(listTitle, listDescription, 100, false).then(() => {
+        console.log(`${listTitle} List created successfully`);
+        ListColumns.forEach(function (item, index) {
+          if (item.Type == "SingleLine") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addText(item.Name, 255, {
+              Group: "Custom Column",
+            }).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+              const progress = (1 * 100 / 40);
+              handler.updateProgress(progress);
+            })
+          }
+          else if (item.Type == "MultiLine") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addMultilineText(item.Name, 255, true, false, false, true, {
+              Group: "Custom Column",
+            }).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+              const progress = (1 * 100 / 40);
+              handler.updateProgress(progress);
+            })
+          }
+          else if (item.Type == "User") {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addUser(item.Name).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+              const progress = (1 * 100 / 40);
+              handler.updateProgress(progress);
+            })
+          }
+        })
+        // Execute the batch
+        batch.execute().then(function () {
+          console.log("Workflow List Batch operations completed successfully");
         }).catch(function (error: any) {
           console.log("Error in batch operations: " + error);
         });
@@ -325,7 +386,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -333,7 +394,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -341,7 +402,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = Math.ceil(1 * 100 / 34);
+              const progress = (1 * 100 / 40);
               handler.updateProgress(progress);
             })
           }
@@ -367,6 +428,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       await this.FormListCreation();
       await this.tableListCreation();
       await this.equipmentListCreation();
+      await this.workFlowListCreation();
     } catch (error) {
       console.error("Error configuring lists:", error);
     }
@@ -388,6 +450,12 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       ShowViewForm: true
     })
 
+  }
+  public goToEditFields() {
+    this.setState({
+      ShowDashboard: false,
+      ShowEditFields: true
+    })
   }
   public render(): React.ReactElement<IDashboardProps> {
     // const {
@@ -441,6 +509,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
                 <div className="dashboard-wrap">
                   <div className="heading-block clearfix">
                     <h2> Dashboard </h2>
+                    <p className="purchase_btn" onClick={() => this.goToEditFields()}>Add/Edit/Delete</p>
                     <p className="purchase_btn" onClick={() => this.goToNewRequestForm()}>Create New Request</p>
                   </div>
 
@@ -529,6 +598,13 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
         }
         {this.state.ShowViewForm == true &&
           <ViewForm
+            itemId={this.state.ViewFormID}
+            description={''}
+            siteurl={this.props.siteurl} isDarkTheme={false} environmentMessage={''} hasTeamsContext={false} userDisplayName={''}
+          />
+        }
+        {this.state.ShowEditFields == true &&
+          <EditFields
             itemId={this.state.ViewFormID}
             description={''}
             siteurl={this.props.siteurl} isDarkTheme={false} environmentMessage={''} hasTeamsContext={false} userDisplayName={''}

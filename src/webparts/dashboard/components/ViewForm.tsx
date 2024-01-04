@@ -163,6 +163,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                 $("#work_permit tfoot").hide();
                 for (var i = 0; i < items.length; i++) {
                     $("#work_permit_tbody").append(`<tr>
+                    <td style="display:none;"><input type='text' id="itemid" value='${items[i].ID}' /></td>
                     <td><input type='text' id='work_permit_name' value='${items[i].Title}' readonly  /></td>
                     <td><input type='text' id='work_permit_company' value='${items[i].Company}' readonly  /></td>
                     <td><input type='text' id='work_permit_position' value='${items[i].Position}' readonly  /></td>
@@ -179,6 +180,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                 for (var m = 0; m < items.length; m++) {
                     if (m == 0) {
                         $("#permit_request_tbody").append(`<tr>
+                        <td style="display:none;"><input type='text' id="equip_id" value='${items[m].ID}' /></td>
                     <td><p className='location'>${items[m].Title}</p></td>
                     <td><input readonly type='text' className='location_value' value='${items[m].LocationValue}' /></td>
                     <td><p className='area'>${items[m].Area}</p></td>
@@ -195,6 +197,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                 </tr>`)
                     } else {
                         $("#permit_request_tbody").append(`<tr>
+                        <td style="display:none;"><input type='text' id="equip_id" value='${items[m].ID}' /></td>
                         <td><p className='location'>${items[m].Title}</p></td>
                         <td><input readonly type='text' className='location_value' value='${items[m].LocationValue}' /></td>
                         <td><p className='area'>${items[m].Area}</p></td>
@@ -213,6 +216,44 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                 }
             }
         });
+    }
+    public saveWorkPermitRequestDetails() {
+        var itemsToUpdate: any = [];
+        var batch = NewWeb.createBatch();
+        $("#work_permit_tbody tr").each(function (i, J) {
+            var Id: any = $(this).find('#itemid').val();
+            var Name = $(this).find('#Work_permit_name').val();
+            var Company = $(this).find('#Work_permit_company').val();
+            var Position = $(this).find('#Work_permit_position').val();
+            var Date = $(this).find('#Work_permit_date').val();
+            var item = {
+                Title: Name,
+                Company: Company,
+                Position: Position,
+                Date: Date,
+                id: parseInt(Id)
+            };
+            itemsToUpdate.push({
+                action: "update",
+                item: item
+            });
+        })
+        // Execute the batch operations
+        itemsToUpdate.forEach(function (update: any) {
+            if (update.action === "update") {
+                NewWeb.lists.getByTitle("Permit Table Transaction").inBatch(batch).items.getById(update.id).add(update.item);
+            }
+        });
+
+        // Execute the batch
+        batch.execute().then(function () {
+            console.log("Batch operations Updated successfully Work Permit Request Transaction");
+        }).catch(function (error: any) {
+            console.log("Error in batch operations Work Permit Request Transaction: " + error);
+        });
+    }
+    public updateForm() {
+        this.saveWorkPermitRequestDetails();
     }
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);
@@ -495,10 +536,10 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                                                     </div>
                                                 </div>
                                             </div>
-                                            {/* <div className="button">
-                                                <button className="submit_btn"> Submit </button>
+                                            <div className="button">
+                                                <button className="submit_btn"> Update </button>
                                                 <button className="cancel_btn"> Cancel </button>
-                                            </div> */}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
