@@ -393,105 +393,7 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             ShowNewForm: false
         })
     }
-    public addInputField() {
-        if (this.dynamicFieldValidation()) {
-            var FieldName: any = $("#field_name").val();
-            var FieldType = $("#field_type").val();
-            var Count = this.state.InputFieldCount
-            this.setState({
-                InputFieldCount: Count + 1
-            })
-            var TrimmedText = FieldName.replace(/\s+/g, '').trim()
-            if (FieldType == "SingleLine") {
-                $("#dynamic_fields").append(`<div class="col-md-3 added_field">
-       <div class="form-group">
-           <label id='field_name${Count}'>${FieldName}</label>
-           <span id='type${Count}' style="display:none;">${FieldType}</span>
-           <input type='text' id='SingleLine${Count}' class="form-control" />           
-       </div>
-   </div>`)
-                var ColumnName = TrimmedText + RequestID.replace("-", "");
-                NewWeb.lists.getByTitle("Form Master").fields.addText(ColumnName, 255, {
-                    Group: "Custom Column",
-                }).then(() => {
-                    NewWeb.lists.getByTitle("Columns Master").items.add({
-                        Title: FieldName,
-                        ColumnType: FieldType,
-                        RequestID: RequestID
-                    })
-                    $("#field_name").val("");
-                    $("#field_type").val("null");
-                })
-            }
-            else if (FieldType == "MultiLine") {
-                $("#dynamic_fields").append(`<div class="col-md-3 added_field">
-            <div class="form-group">
-                <label id='field_name${Count}'>${FieldName}</label>
-                <span id='type${Count}' style="display:none;">${FieldType}</span>
-                <textarea id='MultiLine${Count}' class="form-control" /></textarea>           
-            </div>
-        </div>`)
-                var ColumnName = TrimmedText + RequestID.replace("-", "");
-                NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(ColumnName, 255, true, false, false, true, {
-                    Group: "Custom Column",
-                }).then(() => {
-                    NewWeb.lists.getByTitle("Columns Master").items.add({
-                        Title: FieldName,
-                        ColumnType: FieldType,
-                        RequestID: RequestID
-                    })
-                    $("#field_name").val("");
-                    $("#field_type").val("null");
-                })
-            }
-            else if (FieldType == "Boolean") {
-                $("#dynamic_fields").append(` <div class="col-md-3 added_field radio_block">
-<div class="form-group">
-    <label id='field_name${Count}'>${FieldName}</label>
-    <span id='type${Count}' style="display:none;">${FieldType}</span>
-    <div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="${FieldName}" id="Yes${Count}" />
-            <label class="form-check-label" htmlFor="Yes${Count}">Yes</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="${FieldName}" id="No${Count}" />
-            <label class="form-check-label" htmlFor="No${Count}">No</label>
-        </div>
-    </div>
-</div>
-</div>`)
-                var ColumnName = TrimmedText + RequestID.replace("-", "");
-                NewWeb.lists.getByTitle("Form Master").fields.addBoolean(ColumnName).then(() => {
-                    NewWeb.lists.getByTitle("Columns Master").items.add({
-                        Title: FieldName,
-                        ColumnType: FieldType,
-                        RequestID: RequestID
-                    })
-                    $("#field_name").val("");
-                    $("#field_type").val("null");
-                })
-            }
-        }
-    }
-    public dynamicFieldValidation() {
-        var FormStatus = true;
-        var FieldName = $("#field_name").val();
-        var FieldType = $("#field_type").val();
-        if (FieldName == "") {
-            FormStatus = false
-            $(".err_field_name").show()
-        } else {
-            $(".err_field_name").hide()
-        }
-        if (FieldType == "null") {
-            FormStatus = false
-            $(".err_field_type").show()
-        } else {
-            $(".err_field_type").hide()
-        }
-        return FormStatus;
-    }
+
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);
         SPComponentLoader.loadScript(`https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js`);
@@ -541,32 +443,6 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
                                         <h2>New Form</h2>
                                     </div>
                                     <div className='clearfix wrapper-main'>
-                                        <div>
-                                            <button onClick={() => this.addInputField()}>Add Field</button>
-                                            <div className="form_block">
-                                                <div className="row">
-                                                    <div className="col-md-3">
-                                                        <div className="form-group">
-                                                            <label> Field Name</label>
-                                                            <input type='text' id="field_name" className="form-control" />
-                                                            <p className='err-msg err_field_name' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-3">
-                                                        <div className="form-group">
-                                                            <label>Type</label>
-                                                            <select className="form-select form-select-lg mb-3" id='field_type' >
-                                                                <option value="null">Select</option>
-                                                                <option value="SingleLine">SingleLine</option>
-                                                                <option value="MultiLine">MultiLine</option>
-                                                                <option value="Boolean">Boolean</option>
-                                                            </select>
-                                                            <p className='err-msg err_field_type' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div className='section1 forms'>
                                             <h4>PERMIT REQUEST</h4>
                                             <div className="form_block">
