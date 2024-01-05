@@ -229,14 +229,20 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
         if (this.dynamicFieldValidation()) {
             var FieldName: any = $("#field_name").val();
             var FieldType = $("#field_type").val();
+            var Required = $("#required").prop("checked")
             if (FieldType == "SingleLine") {
                 NewWeb.lists.getByTitle("Form Master").fields.addText(FieldName, 255, {
                     Group: "Custom Column",
-                }).then(() => {
+                }).then((field: any) => {
+                    const fieldToUpdate = NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(field.data.InternalName);
+                    fieldToUpdate.update({
+                        Required: Required
+                    })
                     Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
+                        $("#required").prop("checked", false);
                         this.getAllFields();
                     })
                     console.log(`${FieldName} column added successfully`)
@@ -245,44 +251,64 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
             else if (FieldType == "MultiLine") {
                 NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(FieldName, 255, true, false, false, true, {
                     Group: "Custom Column",
-                }).then(() => {
+                }).then((field: any) => {
+                    const fieldToUpdate = NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(field.data.InternalName);
+                    fieldToUpdate.update({
+                        Required: Required
+                    })
                     Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
+                        $("#required").prop("checked", false);
                         this.getAllFields();
                     })
                     console.log(`${FieldName} column added successfully`)
                 })
             }
             else if (FieldType == "Boolean") {
-                NewWeb.lists.getByTitle("Form Master").fields.addBoolean(FieldName).then(() => {
+                NewWeb.lists.getByTitle("Form Master").fields.addBoolean(FieldName).then((field: any) => {
+                    const fieldToUpdate = NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(field.data.InternalName);
+                    fieldToUpdate.update({
+                        Required: Required
+                    })
                     Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
+                        $("#required").prop("checked", false);
                         this.getAllFields();
                     })
                     console.log(`${FieldName} column added successfully`)
                 })
             }
             else if (FieldType == "Number") {
-                NewWeb.lists.getByTitle("Form Master").fields.addNumber(FieldName).then(() => {
+                NewWeb.lists.getByTitle("Form Master").fields.addNumber(FieldName).then((field: any) => {
+                    const fieldToUpdate = NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(field.data.InternalName);
+                    fieldToUpdate.update({
+                        Required: Required
+                    })
                     Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
+                        $("#required").prop("checked", false);
                         this.getAllFields();
                     })
                     console.log(`${FieldName} column added successfully`)
                 })
             }
             else if (FieldType == "Date") {
-                NewWeb.lists.getByTitle("Form Master").fields.addDateTime(FieldName).then(() => {
+                NewWeb.lists.getByTitle("Form Master").fields.addDateTime(FieldName).then((field: any) => {
+                    const fieldToUpdate = NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(field.data.InternalName);
+                    fieldToUpdate.update({
+                        Required: Required
+                    })
                     Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
+                        $("#required").prop("checked", false);
                         this.getAllFields();
                     })
                     console.log(`${FieldName} column added successfully`)
@@ -417,6 +443,12 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                                                                 <option value="Date">Date</option>
                                                             </select>
                                                             <p className='err-msg err_field_type' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <div className="form-group">
+                                                            <label>Required</label>
+                                                            <input type='checkbox' id="required" className="form-control" />
                                                         </div>
                                                     </div>
                                                 </div>
