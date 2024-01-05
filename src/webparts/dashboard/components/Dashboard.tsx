@@ -155,8 +155,8 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
     var handler = this;
     var ListColumns = [{ Name: "NatureofWork", Type: "MultiLine" },
     { Name: "WorkTitle", Type: "MultiLine" },
-    { Name: "StartDate", Type: "SingleLine" },
-    { Name: "EndDate", Type: "SingleLine" },
+    { Name: "StartDate", Type: "Date" },
+    { Name: "EndDate", Type: "Date" },
     { Name: "EquipmentDescription", Type: "MultiLine" },
     { Name: "HazardousAreaclassification", Type: "MultiLine" },
     { Name: "DescriptionofWork", Type: "MultiLine" },
@@ -192,6 +192,14 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addMultilineText(item.Name, 255, true, false, false, true, {
               Group: "Custom Column",
             }).then(() => {
+              NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
+              console.log(`${item.Name} column created successfully`)
+              const progress = (1 * 100 / 40);
+              handler.updateProgress(progress);
+            })
+          }
+          else if (item.Type == "Date") {
+            NewWeb.lists.getByTitle("Form Master").fields.inBatch(batch).addDateTime(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
               const progress = (1 * 100 / 40);

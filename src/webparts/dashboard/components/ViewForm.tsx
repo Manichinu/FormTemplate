@@ -382,7 +382,8 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                             </div>
                         </div>
                     )
-                } else if (item.TypeDisplayName == "Multiple lines of text") {
+                }
+                else if (item.TypeDisplayName == "Multiple lines of text") {
                     return (
                         <div className="col-md-3 form_inputs">
                             <div className="form-group">
@@ -393,7 +394,8 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                             </div>
                         </div>
                     )
-                } else if (item.TypeDisplayName == "Number") {
+                }
+                else if (item.TypeDisplayName == "Number") {
                     return (
                         <div className="col-md-3 form_inputs">
                             <div className="form-group">
@@ -416,7 +418,8 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                             </div>
                         </div>
                     )
-                } else if (item.TypeDisplayName == "Yes/No") {
+                }
+                else if (item.TypeDisplayName == "Yes/No") {
                     return (
                         <div className="col-md-3 radio_block form_inputs">
                             <div className="form-group">
@@ -425,11 +428,11 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                                 <p id={`column${FieldCount}`} style={{ display: "none" }}>{item.InternalName}</p>
                                 <div>
                                     <div className="form-check">
-                                        <input className={`form-check-input ${item.InternalName}`} type="radio" name="contractor" id={`input_id${FieldCount}`} />
+                                        <input className={`form-check-input ${item.InternalName}`} type="radio" name={`${item.InternalName}`} id={`input_id${FieldCount}`} />
                                         <label className="form-check-label" htmlFor={`input_id${FieldCount}`}>Yes</label>
                                     </div>
                                     <div className="form-check">
-                                        <input className={`form-check-input no_${item.InternalName}`} type="radio" name="contractor" id={`no_input_id${FieldCount}`} />
+                                        <input className={`form-check-input no_${item.InternalName}`} type="radio" name={`${item.InternalName}`} id={`no_input_id${FieldCount}`} />
                                         <label className="form-check-label" htmlFor={`no_input_id${FieldCount}`}>No</label>
                                     </div>
                                 </div>
