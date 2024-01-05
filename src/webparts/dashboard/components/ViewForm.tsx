@@ -316,8 +316,21 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             var FieldInternalName = $("#column" + Key + "").text();
             var InputValue;
             var item;
-            if (FieldType == "SingleLine" || FieldType == "MultiLine" || FieldType == "Number" || FieldType == "Date") {
+            if (FieldType == "SingleLine" || FieldType == "MultiLine" || FieldType == "Number") {
                 InputValue = $("#input_id" + Key + "").val();
+                item = {
+                    [FieldInternalName]: InputValue,
+                }
+                itemsToUpdate.push({
+                    item: item,
+                    id: Id
+                })
+            }
+            else if (FieldType == "Date") {
+                InputValue = $("#input_id" + Key + "").val();
+                if (InputValue == "") {
+                    InputValue = null
+                }
                 item = {
                     [FieldInternalName]: InputValue,
                 }

@@ -18,7 +18,6 @@ import Swal from 'sweetalert2';
 
 
 let NewWeb: any;
-var Count = 0;
 // let SessionID: any;
 
 export interface EditFieldsState {
@@ -45,7 +44,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
             NewFields: [],
             ListFields: [],
             InputFieldCount: 0,
-            InternalName: ""
+            InternalName: "",
         };
         SPComponentLoader.loadScript(`https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js`);
         SPComponentLoader.loadCss(`https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css`);
@@ -115,8 +114,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
             showCancelButton: true, confirmButtonText: 'Delete',
         }).then(async (result) => {
             if (result.isConfirmed) {
-                NewWeb.lists.getByTitle("Form Master").fields.getByTitle(name).delete().then(() => {
-                    Count = 0;
+                NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(name).delete().then(() => {
                     Swal.fire('Deleted successfully!', '', 'success').then(() => {
                         this.getAllFields();
                     })
@@ -127,20 +125,31 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
     public editField(item: any) {
         $(".update_btn").show()
         $("#add_field").hide()
-        $("#field_name").val(item.Title);
+        $(".options").hide();
+        $("#field_name").val(item.Title).focus();
+        if (item.Required == true) {
+            $("#required").prop("checked", true);
+        } else {
+            $("#required").prop("checked", false);
+        }
         this.setState({
             InternalName: item.InternalName
         })
     }
     public async updateField() {
         var newDisplayName = $("#field_name").val();
-        NewWeb.lists.getByTitle("Form Master").fields.getByTitle(this.state.InternalName).update({ Title: newDisplayName }).then(() => {
-            Count = 0;
+        var Required = $("#required").prop("checked");
+        NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(this.state.InternalName).update({
+            Title: newDisplayName,
+            Required: Required
+        }).then(() => {
             Swal.fire('Updated successfully!', '', 'success').then(() => {
                 this.getAllFields();
                 $("#add_field").show()
+                $(".options").show();
                 $(".update_btn").hide()
                 $("#field_name").val("")
+                $("#required").prop("checked", false);
             });
         })
     }
@@ -238,7 +247,6 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                     fieldToUpdate.update({
                         Required: Required
                     })
-                    Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
@@ -249,14 +257,14 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                 })
             }
             else if (FieldType == "MultiLine") {
-                NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(FieldName, 255, true, false, false, true, {
+                NewWeb.lists.getByTitle("Form Master").fields.addMultilineText(FieldName, 255, true, false, false, false, {
                     Group: "Custom Column",
+                    RichText: false,
                 }).then((field: any) => {
                     const fieldToUpdate = NewWeb.lists.getByTitle("Form Master").fields.getByInternalNameOrTitle(field.data.InternalName);
                     fieldToUpdate.update({
                         Required: Required
                     })
-                    Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
@@ -272,7 +280,6 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                     fieldToUpdate.update({
                         Required: Required
                     })
-                    Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
@@ -288,7 +295,6 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                     fieldToUpdate.update({
                         Required: Required
                     })
-                    Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
@@ -304,7 +310,6 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                     fieldToUpdate.update({
                         Required: Required
                     })
-                    Count = 0;
                     Swal.fire('Field added successfully!', '', 'success').then(() => {
                         $("#field_name").val("");
                         $("#field_type").val("null");
@@ -347,6 +352,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
         //   hasTeamsContext,
         //   userDisplayName
         // } = this.props;
+        var Count = 0;
         const Fields: any = this.state.ListFields.map((item, index) => {
             if (item.FromBaseType == false && item.InternalName != "_CommentFlags" && item.InternalName != "_CommentCount" && item.InternalName != "RequestID" && item.InternalName != "Status") {
                 Count += 1;
@@ -355,6 +361,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                         <td>{Count}</td>
                         <td>{item.Title}</td>
                         <td>{item.TypeDisplayName}</td>
+                        <td>{item.Required == true ? "Yes" : "No"}</td>
                         <td>
                             <a href='#'><img className="view_img" src={require('../img/edit.svg')} onClick={() => this.editField(item)} alt="image" /> </a>
                             <a href='#'><img className="view_img" src={require('../img/delete_img.svg')} onClick={() => this.deleteField(item.InternalName)} alt="image" /> </a>
@@ -409,6 +416,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                                                                 <th>S.No</th>
                                                                 <th>Name</th>
                                                                 <th>Type</th>
+                                                                <th>Required</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -431,7 +439,7 @@ export default class EditFields extends React.Component<IDashboardProps, EditFie
                                                             <p className='err-msg err_field_name' style={{ display: "none" }}><img src={require('../img/error.svg')} className="err-icon" />This field is required</p>
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-3 options">
                                                         <div className="form-group">
                                                             <label>Type</label>
                                                             <select className="form-select form-select-lg mb-3" id='field_type' >

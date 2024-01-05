@@ -184,17 +184,18 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
           else if (item.Type == "MultiLine") {
-            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addMultilineText(item.Name, 255, true, false, false, true, {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addMultilineText(item.Name, 255, true, false, false, false, {
               Group: "Custom Column",
+              RichText: false,
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -202,7 +203,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle("Form Master").fields.inBatch(batch).addDateTime(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -210,7 +211,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -249,7 +250,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -257,7 +258,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -293,7 +294,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -333,17 +334,18 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
           else if (item.Type == "MultiLine") {
-            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addMultilineText(item.Name, 255, true, false, false, true, {
+            NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addMultilineText(item.Name, 255, true, false, false, false, {
               Group: "Custom Column",
+              RichText: false,
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -351,7 +353,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addUser(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -394,7 +396,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             }).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -402,7 +404,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addNumber(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -410,7 +412,7 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
             NewWeb.lists.getByTitle(listTitle).fields.inBatch(batch).addBoolean(item.Name).then(() => {
               NewWeb.lists.getByTitle(listTitle).defaultView.fields.add(item.Name)
               console.log(`${item.Name} column created successfully`)
-              const progress = (1 * 100 / 40);
+              const progress = (1 * 100 / 24);
               handler.updateProgress(progress);
             })
           }
@@ -432,10 +434,10 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
       $("#configure").hide();
       $(".progress_container").show();
       await this.configureListCreation();
-      await this.columnsMasterListCreation();
+      // await this.columnsMasterListCreation();
       await this.FormListCreation();
-      await this.tableListCreation();
-      await this.equipmentListCreation();
+      // await this.tableListCreation();
+      // await this.equipmentListCreation();
       await this.workFlowListCreation();
     } catch (error) {
       console.error("Error configuring lists:", error);
