@@ -412,11 +412,16 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
         if (this.inputFieldValidation()) {
             RequestID = "Session-" + moment().format("DDMMYYYYHHmmss");
             var handler = this;
+            Swal.fire({
+                title: 'Pending',
+                showConfirmButton: false
+            });
             NewWeb.lists.getByTitle("Form Master").items.add({
                 Title: "Form",
                 RequestID: RequestID,
                 Status: "Pending"
             }).then((addedItem: any) => {
+                this.addWFHistory();
                 console.log("Added", addedItem)
                 var Id = addedItem.data.Id;
                 var itemsToUpdate: any = [];
@@ -513,6 +518,15 @@ export default class NewRequestForm extends React.Component<IDashboardProps, For
             }
         }
         return FormStatus;
+    }
+    public addWFHistory() {
+        NewWeb.lists.getByTitle("WorkFlow History").items.add({
+            Title: "WF",
+            AssignedById: this.state.CurrentUserID,
+            AssignedToId: this.state.CurrentUserID,
+            RequestID: RequestID,
+            Status: "Pending"
+        })
     }
 
     public render(): React.ReactElement<IDashboardProps> {

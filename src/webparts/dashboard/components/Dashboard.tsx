@@ -80,6 +80,14 @@ export default class Dashboard extends React.Component<IDashboardProps, Dashboar
         this.setState({
           ShowDashboard: true
         })
+        const searchParams = new URLSearchParams(window.location.search);
+        const hasSessionID = searchParams.has("SessionID");
+        if (hasSessionID) {
+          this.setState({
+            ShowDashboard: false,
+            ShowViewForm: true
+          })
+        }
       }
     }).catch((error: any) => {
       this.setState({

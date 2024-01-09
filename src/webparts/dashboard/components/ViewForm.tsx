@@ -25,6 +25,7 @@ export interface ViewFormState {
     FormInputs: any[];
     ItemId: number;
     FieldCount: number;
+    WFItemId: number;
 }
 
 export default class ViewForm extends React.Component<IDashboardProps, ViewFormState, {}> {
@@ -39,12 +40,21 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             NewFields: [],
             FormInputs: [],
             ItemId: 0,
-            FieldCount: 0
+            FieldCount: 0,
+            WFItemId: 0
         };
         NewWeb = Web(this.props.siteurl);
         SessionID = this.props.itemId;
     }
     public componentDidMount() {
+        const searchParams = new URLSearchParams(window.location.search);
+        const hasSessionID = searchParams.has("SessionID");
+        if (hasSessionID) {
+            SessionID = searchParams.get("SessionID");
+            console.log(SessionID);
+        } else {
+            console.log(SessionID);
+        }
         this.GetCurrentLoggedUser();
         this.getAllFields();
         console.log(moment("2024-01-04T20:00:00Z").format("DD/MM/YYYY"))
@@ -279,6 +289,7 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             }
         }).then(() => {
             this.getFormMasterTransaction();
+            this.getWFHistory();
         })
     }
     public getFormMasterTransaction() {
@@ -304,12 +315,26 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
             })
         })
     }
+    public getWFHistory() {
+        NewWeb.lists.getByTitle("WorkFlow History").items.filter(`RequestID eq '${SessionID}'`).get().then((items: any) => {
+            this.setState({
+                WFItemId: items[0].ID
+            })
+            if (items[0].Status == "Approved" || items[0].Status == "Rejected") {
+                $(".wf_status").hide()
+            }
+        })
+    }
     public updateFormTransaction() {
         var handler = this;
         var Id = this.state.ItemId;
         var itemsToUpdate: any = [];
         var batch = NewWeb.createBatch();
         var InputFieldLength = $(".form_inputs").length;
+        Swal.fire({
+            title: 'Pending',
+            showConfirmButton: false
+        });
         for (var i = 0; i < InputFieldLength; i++) {
             var Key = i + 1;
             var FieldType = $("#type" + Key + "").text();
@@ -367,6 +392,31 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
         }).catch(function (error: any) {
             console.log("Error in batch operations: " + error);
         });
+    }
+    public Approve() {
+        NewWeb.lists.getByTitle("Form Master").items.getById(this.state.ItemId).update({
+            Status: "Approved"
+        })
+        NewWeb.lists.getByTitle("WorkFlow History").items.getById(this.state.WFItemId).update({
+            Status: "Approved",
+            ApprovedById: this.state.CurrentUserID
+        }).then(() => {
+            Swal.fire('Approved successfully!', '', 'success').then(() => {
+                window.open("https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SitePages/FormTemplate.aspx?env=WebView", "_self");
+            })
+        })
+    }
+    public Reject() {
+        NewWeb.lists.getByTitle("Form Master").items.getById(this.state.ItemId).update({
+            Status: "Rejected"
+        })
+        NewWeb.lists.getByTitle("WorkFlow History").items.getById(this.state.WFItemId).update({
+            Status: "Rejected"
+        }).then(() => {
+            Swal.fire('Rejected successfully!', '', 'success').then(() => {
+                window.open("https://remodigital.sharepoint.com/sites/Remo/RemoSolutions/DigitalForms/POC/SitePages/FormTemplate.aspx?env=WebView", "_self");
+            })
+        })
     }
     public render(): React.ReactElement<IDashboardProps> {
         SPComponentLoader.loadCss(`${this.props.siteurl}/SiteAssets/AlQasimiForms/css/style.css?v=1.5`);
@@ -724,6 +774,8 @@ export default class ViewForm extends React.Component<IDashboardProps, ViewFormS
                                                 </div>
                                             </div>
                                             <div className="button">
+                                                <button className="submit_btn wf_status" onClick={() => this.Approve()}> Approve </button>
+                                                <button className="submit_btn wf_status" onClick={() => this.Reject()}> Reject </button>
                                                 <button className="submit_btn" onClick={() => this.updateFormTransaction()}> Update </button>
                                                 <button className="cancel_btn"> Cancel </button>
                                             </div>
